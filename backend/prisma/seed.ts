@@ -4,6 +4,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 async function main() {
+  const existingAdmin = await prisma.user.findUnique({ where: { email: 'admin@watermark.com' } });
+  if (existingAdmin) {
+    console.log('Database already seeded. Skipping seed process.');
+    return;
+  }
+
   const passwordHash = await bcrypt.hash('admin123', 10);
   
   await prisma.user.upsert({

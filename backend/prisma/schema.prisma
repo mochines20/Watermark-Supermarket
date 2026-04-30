@@ -1,0 +1,459 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Users & Auth
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  passwordHash  String
+  role          Role     // ENUM: see below
+  department    Department
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum Role {
+  STORE_MANAGER
+  FINANCE_BUDGETING
+  CFO
+  PURCHASING_OFFICER
+  RECEIVING_CLERK
+  INVENTORY_CUSTODIAN
+  AP_CLERK
+  TREASURER
+  CASHIER
+  ADMIN
+}
+
+enum Department {
+  PROCUREMENT
+  RECEIVING
+  INVENTORY
+  FINANCE
+  MANAGEMENT
+  ADMINISTRATION
+}
+
+// Item Master File
+model Item {
+  id            String   @id @default(uuid())
+  itemCode      String   @unique
+  description   String
+  category      String
+  unit          String
+  standardCost  Decimal
+  reorderPoint  Int
+  reorderQty    Int
+  barcode       String?  @unique
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  inventoryStockStatus InventoryStock[]
+}
+
+// Inventory Stock Status File
+model InventoryStock {
+  id            String   @id @default(uuid())
+  item          Item     @relation(fields: [itemId], references: [id])
+  itemId        String
+  qtyOnHand     Int
+  qtyOnOrder    Int      @default(0)
+  lastUpdated   DateTime @default(now())
+  updatedBy     String
+}
+
+// Approved Suppliers Master File
+model Supplier {
+  id              String   @id @default(uuid())
+  vendorCode      String   @unique
+  name            String
+  address         String
+  contactPerson   String
+  contactDetails  String
+  email           String
+  tin             String
+  paymentTerms    String
+  isAccredited    Boolean  @default(true)
+  accreditedDate  DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  purchaseOrders  PurchaseOrder[]
+  invoices        SupplierInvoice[]
+  apLedgerEntries APLedgerEntry[]
+}
+
+// Purchase Requisition
+model PurchaseRequisition {
+  id                String   @id @default(uuid())
+  prNumber          String   @unique // System-generated: PR-YYYY-XXXXX
+  requestedBy       String
+  requestingDept    String
+  purposeOfRequest  String
+  address           String
+  contactNo         String
+  datePrepared      DateTime @default(now())
+  dateNeeded        DateTime
+  suggestedSupplier String?
+  vendorCode        String?
+  supplierAddress   String?
+  contactPerson     String?
+  contactDetails    String?
+  totalCost         Decimal
+  status            PRStatus @default(DRAFT)
+  approvalLevel     String?  // STORE_MANAGER | FINANCE | CFO
+  approvedBy        String?
+  approvedAt        DateTime?
+  rejectedBy        String?
+  rejectedAt        DateTime?
+  rejectionRemarks  String?
+  linkedPONumber    String?
+  encodedBy         String
+  systemRefNo       String   @unique @default(uuid())
+  items             PRItem[]
+  purchaseOrders    PurchaseOrder[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+enum PRStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  CONVERTED_TO_PO
+}
+
+model PRItem {
+  id          String @id @default(uuid())
+  pr          PurchaseRequisition @relation(fields: [prId], references: [id])
+  prId        String
+  itemCode    String
+  description String
+  quantity    Int
+  unit        String
+  unitCost    Decimal
+  totalCost   Decimal
+}
+
+// Purchase Order
+model PurchaseOrder {
+  id              String   @id @default(uuid())
+  poNumber        String   @unique // System-generated: PO-YYYY-XXXXX
+  supplier        Supplier @relation(fields: [supplierId], references: [id])
+  supplierId      String
+  pr              PurchaseRequisition @relation(fields: [prId], references: [id])
+  prId            String
+  date            DateTime @default(now())
+  forDepartment   String
+  requisitioner   String
+  shipVia         String?
+  fob             String?
+  shippingTerms   String?
+  subtotal        Decimal
+  taxVat          Decimal
+  total           Decimal
+  status          POStatus @default(OPEN)
+  preparedBy      String
+  approvedBy      String?
+  approvedAt      DateTime?
+  items           POItem[]
+  receivingReports ReceivingReport[]
+  invoices        SupplierInvoice[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum POStatus {
+  OPEN
+  PARTIALLY_RECEIVED
+  RECEIVED
+  CANCELLED
+}
+
+model POItem {
+  id          String @id @default(uuid())
+  po          PurchaseOrder @relation(fields: [poId], references: [id])
+  poId        String
+  itemNo      String
+  quantity    Int
+  description String
+  unitPrice   Decimal
+  amount      Decimal
+}
+
+// Receiving Report
+model ReceivingReport {
+  id              String   @id @default(uuid())
+  rrNumber        String   @unique // System-generated: RR-YYYY-XXXXX
+  po              PurchaseOrder @relation(fields: [poId], references: [id])
+  poId            String
+  receivedFrom    String
+  via             String
+  supplierId      String
+  poDate          DateTime
+  invoiceNo       String?
+  dateReceived    DateTime @default(now())
+  prNumber        String
+  status          RRStatus @default(VERIFIED)
+  receivingPersonnel String
+  items           RRItem[]
+  discrepancyReports DiscrepancyReport[]
+  invoices        SupplierInvoice[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum RRStatus {
+  PENDING
+  VERIFIED
+  DISCREPANCY
+}
+
+model RRItem {
+  id          String @id @default(uuid())
+  rr          ReceivingReport @relation(fields: [rrId], references: [id])
+  rrId        String
+  itemNo      String
+  description String
+  quantity    Int
+  unitPrice   Decimal
+  total       Decimal
+}
+
+// Discrepancy Report
+model DiscrepancyReport {
+  id                String   @id @default(uuid())
+  reportNo          String   @unique // System-generated: DR-YYYY-XXXXX
+  rr                ReceivingReport @relation(fields: [rrId], references: [id])
+  rrId              String
+  date              DateTime @default(now())
+  reportedBy        String
+  department        String
+  location          String
+  prNumber          String
+  poNumber          String
+  rrNumber          String
+  supplier          String
+  descriptionOfIssue String
+  natureQuantity    Boolean  @default(false)
+  natureQuality     Boolean  @default(false)
+  naturePricing     Boolean  @default(false)
+  natureOthers      String?
+  photoEvidence1    String?  // Supabase Storage URL
+  photoEvidence2    String?  // Supabase Storage URL
+  recommendedAction String
+  receivedBy        String
+  receivedByPosition String
+  receivedAt        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Supplier Invoice
+model SupplierInvoice {
+  id              String   @id @default(uuid())
+  invoiceNo       String   @unique
+  supplier        Supplier @relation(fields: [supplierId], references: [id])
+  supplierId      String
+  po              PurchaseOrder @relation(fields: [poId], references: [id])
+  poId            String
+  rr              ReceivingReport? @relation(fields: [rrId], references: [id])
+  rrId            String?
+  invoiceDate     DateTime
+  dueDate         DateTime
+  grossAmount     Decimal
+  discount        Decimal  @default(0)
+  netAmount       Decimal
+  vatAmount       Decimal
+  totalAmountDue  Decimal
+  threeWayStatus  MatchStatus @default(PENDING)
+  status          InvoiceStatus @default(OPEN)
+  items           InvoiceItem[]
+  voucherPackages VoucherPackage[]
+  apLedgerEntries APLedgerEntry[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum MatchStatus {
+  PENDING
+  MATCHED
+  EXCEPTION
+}
+
+enum InvoiceStatus {
+  OPEN
+  ON_HOLD
+  APPROVED
+  PAID
+  CANCELLED
+}
+
+model InvoiceItem {
+  id          String @id @default(uuid())
+  invoice     SupplierInvoice @relation(fields: [invoiceId], references: [id])
+  invoiceId   String
+  no          Int
+  description String
+  qty         Int
+  unit        String
+  unitPrice   Decimal
+  amount      Decimal
+}
+
+// Voucher Package
+model VoucherPackage {
+  id              String   @id @default(uuid())
+  voucherNo       String   @unique // System-generated: CDV-YYYY-XXXXX or CV-YYYY-XXXXX
+  voucherType     VoucherType // CASH_DISBURSEMENT | CHECK
+  invoice         SupplierInvoice @relation(fields: [invoiceId], references: [id])
+  invoiceId       String
+  payee           String
+  payeeAddress    String?
+  amountFigures   Decimal
+  amountWords     String
+  modeOfPayment   PaymentMode
+  checkRefNo      String?
+  explanation     String
+  accountTitle    String?
+  accountCode     String?
+  glAccount       String?
+  systemRef       String?
+  debitTotal      Decimal
+  creditTotal     Decimal
+  unbalancedAmt   Decimal  @default(0)
+  systemEntryPosted Boolean @default(false)
+  status          VoucherStatus @default(PENDING)
+  preparedBy      String
+  checkedBy       String?
+  approvedBy      String?
+  approvedAt      DateTime?
+  rejectedBy      String?
+  rejectedAt      DateTime?
+  receivedBy      String?
+  dateReceived    DateTime?
+  entries         VoucherEntry[]
+  payments        Payment[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum VoucherType {
+  CASH_DISBURSEMENT
+  CHECK
+}
+enum PaymentMode {
+  CASH
+  CHECK
+  ONLINE_TRANSFER
+}
+enum VoucherStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  DISBURSED
+  CLOSED
+}
+
+model VoucherEntry {
+  id          String @id @default(uuid())
+  voucher     VoucherPackage @relation(fields: [voucherId], references: [id])
+  voucherId   String
+  particulars String
+  debit       Decimal @default(0)
+  credit      Decimal @default(0)
+}
+
+// Payment / Disbursement
+model Payment {
+  id                String   @id @default(uuid())
+  voucher           VoucherPackage @relation(fields: [voucherId], references: [id])
+  voucherId         String
+  paymentDate       DateTime @default(now())
+  amount            Decimal
+  checkNo           String?
+  referenceNo       String?
+  remittanceAdvice  String?
+  supplierORNo      String?
+  supplierORDate    DateTime?
+  isORValid         Boolean?
+  status            PaymentStatus @default(PENDING_OR)
+  cashier           String
+  apLedgerEntries   APLedgerEntry[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING_OR
+  OR_RECEIVED
+  CLOSED
+}
+
+// AP Subsidiary Ledger
+model APLedgerEntry {
+  id          String   @id @default(uuid())
+  supplier    Supplier @relation(fields: [supplierId], references: [id])
+  supplierId  String
+  invoice     SupplierInvoice? @relation(fields: [invoiceId], references: [id])
+  invoiceId   String?
+  payment     Payment? @relation(fields: [paymentId], references: [id])
+  paymentId   String?
+  date        DateTime @default(now())
+  description String
+  debit       Decimal  @default(0)
+  credit      Decimal  @default(0)
+  balance     Decimal
+  createdAt   DateTime @default(now())
+}
+
+// Inventory Variance Report
+model InventoryVarianceReport {
+  id            String   @id @default(uuid())
+  reportDate    DateTime @default(now())
+  preparedBy    String
+  items         InventoryVarianceItem[]
+  createdAt     DateTime @default(now())
+}
+
+model InventoryVarianceItem {
+  id              String @id @default(uuid())
+  report          InventoryVarianceReport @relation(fields: [reportId], references: [id])
+  reportId        String
+  itemCode        String
+  description     String
+  systemQty       Int
+  physicalQty     Int
+  variance        Int
+  remarks         String?
+}
+
+// System Audit Trail Log
+model AuditLog {
+  id            String   @id @default(uuid())
+  userId        String
+  userName      String
+  action        String   // CREATE | UPDATE | APPROVE | REJECT | DELETE | VIEW
+  module        String   // PR | PO | RR | INVENTORY | AP | VOUCHER | PAYMENT
+  recordId      String
+  recordNo      String?
+  description   String
+  previousData  Json?
+  newData       Json?
+  ipAddress     String?
+  timestamp     DateTime @default(now())
+}
+
+// Counter for auto-numbering
+model Counter {
+  id    String @id @default(uuid())
+  type  String @unique // e.g., 'PR', 'PO', 'RR', 'DR', 'CDV', 'CV'
+  value Int    @default(0)
+}

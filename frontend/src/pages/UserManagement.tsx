@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { StatusBadge } from '../components/ui/StatusBadge';
-import { Shield, Plus, MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { Shield, Plus, Edit2, Trash2 } from 'lucide-react';
 import { PrimaryButton } from '../components/ui/PrimaryButton';
 import api from '../api/client';
-import { format } from 'date-fns';
+
 import toast from 'react-hot-toast';
 
 const UserManagement = () => {

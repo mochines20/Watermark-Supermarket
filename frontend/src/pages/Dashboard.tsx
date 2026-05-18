@@ -2,37 +2,46 @@ import { useState, useEffect } from 'react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { procurementApi } from '../api/procurement';
 import { modulesApi } from '../api/modulesApi';
-import { ShoppingCart, FileText, AlertTriangle, CreditCard, Clock } from 'lucide-react';
+import { ShoppingCart, FileText, AlertTriangle, CreditCard, Clock, Package } from 'lucide-react';
 import { format } from 'date-fns';
+
+const peso = '\u20B1';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [metrics, setMetrics] = useState({
     pendingApprovals: 0,
     openPOs: 0,
+    pendingDeliveries: 0,
+    pendingInvoices: 0,
     reorderAlerts: 0,
-    outstandingPayables: 0
+    outstandingPayables: 0,
+    approvalBreakdown: {} as Record<string, number>
   });
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [prs, pos, items, invoices] = await Promise.all([
+        const [prs, pos, inventory, invoices, receivingDashboard] = await Promise.all([
           procurementApi.getPRs(),
           procurementApi.getPOs(),
-          procurementApi.getItems(),
-          modulesApi.getInvoices()
+          modulesApi.getInventory(),
+          modulesApi.getInvoices(),
+          modulesApi.getReceivingDashboard()
         ]);
 
         const pendingPRs = prs.filter((pr: any) => pr.status === 'PENDING_APPROVAL').length;
+        const approvalBreakdown = prs
+          .filter((pr: any) => pr.status === 'PENDING_APPROVAL')
+          .reduce((acc: Record<string, number>, pr: any) => {
+            const level = pr.approvalLevel || 'UNASSIGNED';
+            acc[level] = (acc[level] || 0) + 1;
+            return acc;
+          }, {});
         const openPOs = pos.filter((po: any) => po.status === 'OPEN').length;
-        
-        let reorderAlerts = 0;
-        items.forEach((item: any) => {
-          const stock = item.inventoryStockStatus?.[0]?.qtyOnHand || 0;
-          if (stock <= item.reorderPoint) reorderAlerts++;
-        });
+        const reorderAlerts = inventory.filter((item: any) => ['LOW_STOCK', 'CRITICAL'].includes(item.stockStatus)).length;
+        const pendingInvoices = invoices.filter((inv: any) => ['PENDING', 'OPEN', 'DRAFT'].includes(inv.status)).length;
 
         const outstandingPayables = invoices
           .filter((inv: any) => inv.status !== 'PAID' && inv.status !== 'CANCELLED')
@@ -41,8 +50,11 @@ const Dashboard = () => {
         setMetrics({
           pendingApprovals: pendingPRs,
           openPOs,
+          pendingDeliveries: receivingDashboard.pendingDeliveries || 0,
+          pendingInvoices,
           reorderAlerts,
-          outstandingPayables
+          outstandingPayables,
+          approvalBreakdown
         });
 
         // Combine PRs and POs for recent activity
@@ -89,6 +101,15 @@ const Dashboard = () => {
           <div className="text-4xl font-bold text-white mt-4 display-font">
             {loading ? '...' : metrics.pendingApprovals}
           </div>
+          {!loading && Object.keys(metrics.approvalBreakdown).length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {Object.entries(metrics.approvalBreakdown).map(([level, count]) => (
+                <span key={level} className="text-[10px] px-2 py-1 rounded-full bg-white/10 text-watermark-blue-200">
+                  {level.replace(/_/g, ' ')}: {count}
+                </span>
+              ))}
+            </div>
+          )}
         </GlassCard>
 
         <GlassCard className="relative overflow-hidden group stagger-2">
@@ -132,7 +153,31 @@ const Dashboard = () => {
             <div className="text-sm text-[#A1B6D0] font-medium">Outstanding Payables</div>
           </div>
           <div className="text-3xl font-bold text-[#4FD3EC] mt-4 display-font tracking-tight">
-            {loading ? '...' : `₱ ${(metrics.outstandingPayables).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+            {loading ? '...' : `${peso} ${(metrics.outstandingPayables).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+          </div>
+        </GlassCard>
+
+        <GlassCard className="relative overflow-hidden group">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-yellow-500/20 rounded-lg text-yellow-300">
+              <Package size={20} />
+            </div>
+            <div className="text-sm text-[#A1B6D0] font-medium">Pending Deliveries</div>
+          </div>
+          <div className="text-4xl font-bold text-white mt-4 display-font">
+            {loading ? '...' : metrics.pendingDeliveries}
+          </div>
+        </GlassCard>
+
+        <GlassCard className="relative overflow-hidden group">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-pink-500/20 rounded-lg text-pink-300">
+              <FileText size={20} />
+            </div>
+            <div className="text-sm text-[#A1B6D0] font-medium">Pending Invoices</div>
+          </div>
+          <div className="text-4xl font-bold text-white mt-4 display-font">
+            {loading ? '...' : metrics.pendingInvoices}
           </div>
         </GlassCard>
       </div>
@@ -166,7 +211,7 @@ const Dashboard = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm font-bold text-white">₱ {Number(act.totalCost || act.total || 0).toLocaleString()}</div>
+                    <div className="text-sm font-bold text-white">{peso} {Number(act.totalCost || act.total || 0).toLocaleString()}</div>
                     <div className="text-xs text-[#A1B6D0]">{format(new Date(act.createdAt), 'MMM dd, h:mm a')}</div>
                   </div>
                 </div>

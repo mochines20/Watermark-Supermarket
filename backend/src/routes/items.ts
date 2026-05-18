@@ -1,6 +1,8 @@
 import express from 'express';
 import prisma from '../utils/prisma';
 import { authenticateToken } from '../middleware/auth';
+import { requireRole } from '../middleware/role';
+import { auditUser, logAudit } from '../utils/audit';
 
 const router = express.Router();
 
@@ -20,7 +22,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requireRole('ADMIN', 'INVENTORY_CUSTODIAN'), async (req, res) => {
   try {
     const { itemCode, description, category, unit, standardCost, reorderPoint, reorderQty, barcode } = req.body;
     
@@ -35,10 +37,11 @@ router.post('/', async (req, res) => {
         description,
         category,
         unit,
-        standardCost,
-        reorderPoint,
+        standardCost: Number(standardCost),
+        reorderPoint: Number(reorderPoint || 0),
         reorderQty,
         barcode,
+        stockStatus: 'CRITICAL',
         inventoryStockStatus: {
           create: {
             qtyOnHand: 0,
@@ -47,6 +50,16 @@ router.post('/', async (req, res) => {
           }
         }
       }
+    });
+
+    const user = auditUser(req);
+    await logAudit(prisma, {
+      ...user,
+      action: 'CREATE',
+      module: 'INVENTORY',
+      referenceId: item.id,
+      referenceNo: item.itemCode,
+      details: `Created item ${item.description}`
     });
     
     res.json(item);
@@ -59,7 +72,7 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const item = await prisma.item.findUnique({
-      where: { id: req.params.id },
+      where: { id: String(req.params.id) },
       include: { inventoryStockStatus: true }
     });
     if (!item) return res.status(404).json({ error: 'Item not found' });

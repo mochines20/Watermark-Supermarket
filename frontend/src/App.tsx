@@ -17,6 +17,12 @@ import ThreeWayMatch from './pages/ThreeWayMatch';
 import AgingReport from './pages/AgingReport';
 import UserManagement from './pages/UserManagement';
 import SystemSettings from './pages/SystemSettings';
+import InventoryList from './pages/Inventory/InventoryList';
+import ReceivingDashboard from './pages/Receiving/ReceivingDashboard';
+import DeliveryList from './pages/Receiving/DeliveryList';
+import GRNEntry from './pages/Receiving/GRNEntry';
+import AccountingDashboard from './pages/Accounting/AccountingDashboard';
+import DVReview from './pages/Disbursement/DVReview';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
@@ -56,15 +62,22 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="pr" element={<PurchaseRequisition />} />
           <Route path="po" element={<PurchaseOrder />} />
+          <Route path="inventory" element={<InventoryList />} />
+          <Route path="receiving" element={<ReceivingDashboard />} />
+          <Route path="receiving/deliveries" element={<DeliveryList />} />
+          <Route path="receiving/grn/new" element={<GRNEntry />} />
+          <Route path="receiving/grn/:id" element={<GRNEntry />} />
           <Route path="receiving/reports" element={<ReceivingReport />} />
           <Route path="receiving/discrepancies" element={<DiscrepancyReports />} />
           <Route path="inventory/stock" element={<StockStatus />} />
           <Route path="inventory/alerts" element={<StockStatus />} />
+          <Route path="accounting" element={<AccountingDashboard />} />
           <Route path="ap/invoices" element={<SupplierInvoices />} />
           <Route path="ap/match" element={<ThreeWayMatch />} />
           <Route path="ap/aging" element={<AgingReport />} />
           <Route path="management/vouchers" element={<VoucherApproval />} />
           <Route path="disbursement/payments" element={<Payments />} />
+          <Route path="disbursement/:id/review" element={<DVReview />} />
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="users" element={<UserManagement />} />
           <Route path="settings" element={<SystemSettings />} />

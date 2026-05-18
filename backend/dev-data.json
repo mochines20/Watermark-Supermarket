@@ -1,0 +1,2866 @@
+{
+  "counters": {
+    "PR": 2,
+    "PO": 2,
+    "RR": 2,
+    "DR": 0,
+    "INV": 1,
+    "CV": 2,
+    "DV": 1
+  },
+  "users": [
+    {
+      "id": "dev-admin-id",
+      "name": "Dev Administrator",
+      "email": "admin@watermark.com",
+      "role": "ADMIN",
+      "department": "ADMINISTRATION",
+      "isActive": true,
+      "createdAt": "2026-05-18T14:10:28.246Z"
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "sup-001",
+      "vendorCode": "SUP-001",
+      "name": "Fresh Farms Produce Ltd.",
+      "address": "Benguet, Philippines",
+      "contactPerson": "Maria Clara",
+      "contactDetails": "0917-123-4567",
+      "email": "sales@freshfarms.com",
+      "tin": "001-234-567-000",
+      "paymentTerms": "NET_45",
+      "creditLimit": 150000,
+      "status": "ACTIVE",
+      "isAccredited": true,
+      "accreditedDate": "2026-05-18T14:10:28.246Z",
+      "createdAt": "2026-05-18T14:10:28.246Z",
+      "updatedAt": "2026-05-18T14:10:57.765Z",
+      "items": [
+        {
+          "id": "itm-001",
+          "itemCode": "ITM-FF-001",
+          "description": "Premium Fuji Apples (Box)",
+          "category": "PRODUCE",
+          "unit": "BOX",
+          "standardCost": 1250,
+          "reorderPoint": 50,
+          "reorderQty": 200,
+          "stockStatus": "LOW_STOCK",
+          "supplierId": "sup-001",
+          "supplierName": "Fresh Farms Produce Ltd.",
+          "qtyOnHand": 50,
+          "qtyOnOrder": 0,
+          "inventoryStockStatus": [
+            {
+              "qtyOnHand": 50,
+              "qtyOnOrder": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sup-002",
+      "vendorCode": "SUP-002",
+      "name": "Unilever Philippines",
+      "address": "BGC, Taguig",
+      "contactPerson": "Juan Dela Cruz",
+      "contactDetails": "02-8888-1234",
+      "email": "distributor@unilever.ph",
+      "tin": "002-987-654-000",
+      "paymentTerms": "NET_60",
+      "creditLimit": 250000,
+      "status": "ACTIVE",
+      "isAccredited": true,
+      "accreditedDate": "2026-05-18T14:10:28.246Z",
+      "createdAt": "2026-05-18T14:10:28.246Z",
+      "updatedAt": "2026-05-18T14:10:28.246Z"
+    }
+  ],
+  "items": [
+    {
+      "id": "itm-001",
+      "itemCode": "ITM-FF-001",
+      "description": "Premium Fuji Apples (Box)",
+      "category": "PRODUCE",
+      "unit": "BOX",
+      "standardCost": 1250,
+      "reorderPoint": 50,
+      "reorderQty": 200,
+      "stockStatus": "NORMAL",
+      "supplierId": "sup-001",
+      "supplierName": "Fresh Farms Produce Ltd.",
+      "qtyOnHand": 52,
+      "qtyOnOrder": 0,
+      "inventoryStockStatus": [
+        {
+          "qtyOnHand": 52,
+          "qtyOnOrder": 0
+        }
+      ]
+    },
+    {
+      "id": "itm-002",
+      "itemCode": "ITM-UL-001",
+      "description": "Dove Soap Original 135g (Pack of 3)",
+      "category": "PERSONAL_CARE",
+      "unit": "PACK",
+      "standardCost": 150,
+      "reorderPoint": 100,
+      "reorderQty": 300,
+      "stockStatus": "NORMAL",
+      "supplierId": "sup-002",
+      "supplierName": "Unilever Philippines",
+      "qtyOnHand": 200,
+      "qtyOnOrder": 0,
+      "inventoryStockStatus": [
+        {
+          "qtyOnHand": 200,
+          "qtyOnOrder": 0
+        }
+      ]
+    }
+  ],
+  "prs": [
+    {
+      "id": "pr-quqq6fy5",
+      "contactNo": "000",
+      "items": [
+        {
+          "unitCost": 1250,
+          "itemCode": "ITM-FF-001",
+          "description": "Premium Fuji Apples (Box)",
+          "quantity": 2,
+          "unit": "BOX"
+        }
+      ],
+      "address": "Watermark",
+      "dateNeeded": "2026-05-21T22:10:57.7979602+08:00",
+      "purposeOfRequest": "QA E2E restock",
+      "requestedBy": "QA User",
+      "vendorCode": "SUP-001",
+      "suggestedSupplier": "Fresh Farms Produce Ltd.",
+      "requestingDept": "QA",
+      "prNumber": "PR-2026-00002",
+      "totalCost": 2500,
+      "status": "APPROVED",
+      "approvalLevel": "STORE_MANAGER",
+      "encodedBy": "Dev Administrator",
+      "createdAt": "2026-05-18T14:10:57.978Z",
+      "updatedAt": "2026-05-18T14:10:57.997Z",
+      "approvedBy": "Dev Administrator",
+      "approvedAt": "2026-05-18T14:10:57.995Z"
+    },
+    {
+      "id": "pr-001",
+      "prNumber": "PR-2026-00001",
+      "requestedBy": "Dev Administrator",
+      "requestingDept": "GROCERY",
+      "purposeOfRequest": "Restocking fast-moving personal care items",
+      "address": "Watermark Supermarket",
+      "contactNo": "123-4567",
+      "datePrepared": "2026-05-18T14:10:28.246Z",
+      "dateNeeded": "2026-05-18T14:10:28.246Z",
+      "suggestedSupplier": "Unilever Philippines",
+      "vendorCode": "SUP-002",
+      "totalCost": 15000,
+      "status": "APPROVED",
+      "approvalLevel": "STORE_MANAGER",
+      "encodedBy": "dev-admin-id",
+      "createdAt": "2026-05-18T14:10:28.246Z",
+      "updatedAt": "2026-05-18T14:10:28.246Z",
+      "items": [
+        {
+          "id": "pri-001",
+          "itemCode": "ITM-UL-001",
+          "description": "Dove Soap Original 135g (Pack of 3)",
+          "quantity": 100,
+          "unit": "PACK",
+          "unitCost": 150,
+          "totalCost": 15000
+        }
+      ]
+    }
+  ],
+  "pos": [
+    {
+      "id": "po-3yywz55u",
+      "poNumber": "PO-2026-00002",
+      "supplierId": "sup-001",
+      "supplier": {
+        "id": "sup-001",
+        "vendorCode": "SUP-001",
+        "name": "Fresh Farms Produce Ltd.",
+        "address": "Benguet, Philippines",
+        "contactPerson": "Maria Clara",
+        "contactDetails": "0917-123-4567",
+        "email": "sales@freshfarms.com",
+        "tin": "001-234-567-000",
+        "paymentTerms": "NET_45",
+        "creditLimit": 150000,
+        "status": "ACTIVE",
+        "isAccredited": true,
+        "accreditedDate": "2026-05-18T14:10:28.246Z",
+        "createdAt": "2026-05-18T14:10:28.246Z",
+        "updatedAt": "2026-05-18T14:10:57.765Z",
+        "items": [
+          {
+            "id": "itm-001",
+            "itemCode": "ITM-FF-001",
+            "description": "Premium Fuji Apples (Box)",
+            "category": "PRODUCE",
+            "unit": "BOX",
+            "standardCost": 1250,
+            "reorderPoint": 50,
+            "reorderQty": 200,
+            "stockStatus": "LOW_STOCK",
+            "supplierId": "sup-001",
+            "supplierName": "Fresh Farms Produce Ltd.",
+            "qtyOnHand": 50,
+            "qtyOnOrder": 0,
+            "inventoryStockStatus": [
+              {
+                "qtyOnHand": 50,
+                "qtyOnOrder": 0
+              }
+            ]
+          }
+        ]
+      },
+      "prId": "pr-quqq6fy5",
+      "pr": {
+        "id": "pr-quqq6fy5",
+        "contactNo": "000",
+        "items": [
+          {
+            "unitCost": 1250,
+            "itemCode": "ITM-FF-001",
+            "description": "Premium Fuji Apples (Box)",
+            "quantity": 2,
+            "unit": "BOX"
+          }
+        ],
+        "address": "Watermark",
+        "dateNeeded": "2026-05-21T22:10:57.7979602+08:00",
+        "purposeOfRequest": "QA E2E restock",
+        "requestedBy": "QA User",
+        "vendorCode": "SUP-001",
+        "suggestedSupplier": "Fresh Farms Produce Ltd.",
+        "requestingDept": "QA",
+        "prNumber": "PR-2026-00002",
+        "totalCost": 2500,
+        "status": "APPROVED",
+        "approvalLevel": "STORE_MANAGER",
+        "encodedBy": "Dev Administrator",
+        "createdAt": "2026-05-18T14:10:57.978Z",
+        "updatedAt": "2026-05-18T14:10:57.997Z",
+        "approvedBy": "Dev Administrator",
+        "approvedAt": "2026-05-18T14:10:57.995Z"
+      },
+      "date": "2026-05-18T14:10:58.010Z",
+      "forDepartment": "QA",
+      "requisitioner": "QA User",
+      "subtotal": 2500,
+      "taxVat": 0,
+      "total": 2500,
+      "status": "RECEIVED",
+      "preparedBy": "Dev Administrator",
+      "items": [
+        {
+          "itemNo": "ITM-FF-001",
+          "description": "Premium Fuji Apples (Box)",
+          "quantity": 2,
+          "unitPrice": 1250
+        }
+      ],
+      "createdAt": "2026-05-18T14:10:58.010Z",
+      "updatedAt": "2026-05-18T14:10:58.010Z"
+    },
+    {
+      "id": "po-001",
+      "poNumber": "PO-2026-00001",
+      "supplierId": "sup-002",
+      "supplier": {
+        "id": "sup-002",
+        "vendorCode": "SUP-002",
+        "name": "Unilever Philippines",
+        "address": "BGC, Taguig",
+        "contactPerson": "Juan Dela Cruz",
+        "contactDetails": "02-8888-1234",
+        "email": "distributor@unilever.ph",
+        "tin": "002-987-654-000",
+        "paymentTerms": "NET_60",
+        "creditLimit": 250000,
+        "status": "ACTIVE",
+        "isAccredited": true,
+        "accreditedDate": "2026-05-18T14:10:28.246Z",
+        "createdAt": "2026-05-18T14:10:28.246Z",
+        "updatedAt": "2026-05-18T14:10:28.246Z"
+      },
+      "prId": "pr-001",
+      "pr": {
+        "id": "pr-001",
+        "prNumber": "PR-2026-00001",
+        "requestedBy": "Dev Administrator",
+        "requestingDept": "GROCERY",
+        "purposeOfRequest": "Restocking fast-moving personal care items",
+        "address": "Watermark Supermarket",
+        "contactNo": "123-4567",
+        "datePrepared": "2026-05-18T14:10:28.246Z",
+        "dateNeeded": "2026-05-18T14:10:28.246Z",
+        "suggestedSupplier": "Unilever Philippines",
+        "vendorCode": "SUP-002",
+        "totalCost": 15000,
+        "status": "APPROVED",
+        "approvalLevel": "STORE_MANAGER",
+        "encodedBy": "dev-admin-id",
+        "createdAt": "2026-05-18T14:10:28.246Z",
+        "updatedAt": "2026-05-18T14:10:28.246Z",
+        "items": [
+          {
+            "id": "pri-001",
+            "itemCode": "ITM-UL-001",
+            "description": "Dove Soap Original 135g (Pack of 3)",
+            "quantity": 100,
+            "unit": "PACK",
+            "unitCost": 150,
+            "totalCost": 15000
+          }
+        ]
+      },
+      "date": "2026-05-18T14:10:28.246Z",
+      "forDepartment": "GROCERY",
+      "requisitioner": "Dev Administrator",
+      "subtotal": 15000,
+      "taxVat": 0,
+      "total": 15000,
+      "status": "OPEN",
+      "preparedBy": "Dev Administrator",
+      "createdAt": "2026-05-18T14:10:28.246Z",
+      "updatedAt": "2026-05-18T14:10:28.246Z",
+      "items": [
+        {
+          "id": "poi-001",
+          "itemNo": "ITM-UL-001",
+          "description": "Dove Soap Original 135g (Pack of 3)",
+          "quantity": 100,
+          "unitPrice": 150,
+          "amount": 15000
+        }
+      ]
+    }
+  ],
+  "rrs": [
+    {
+      "id": "rr-j6o77i92",
+      "rrNumber": "RR-2026-00002",
+      "poId": "po-3yywz55u",
+      "po": {
+        "id": "po-3yywz55u",
+        "poNumber": "PO-2026-00002",
+        "supplierId": "sup-001",
+        "supplier": {
+          "id": "sup-001",
+          "vendorCode": "SUP-001",
+          "name": "Fresh Farms Produce Ltd.",
+          "address": "Benguet, Philippines",
+          "contactPerson": "Maria Clara",
+          "contactDetails": "0917-123-4567",
+          "email": "sales@freshfarms.com",
+          "tin": "001-234-567-000",
+          "paymentTerms": "NET_45",
+          "creditLimit": 150000,
+          "status": "ACTIVE",
+          "isAccredited": true,
+          "accreditedDate": "2026-05-18T14:10:28.246Z",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:57.765Z",
+          "items": [
+            {
+              "id": "itm-001",
+              "itemCode": "ITM-FF-001",
+              "description": "Premium Fuji Apples (Box)",
+              "category": "PRODUCE",
+              "unit": "BOX",
+              "standardCost": 1250,
+              "reorderPoint": 50,
+              "reorderQty": 200,
+              "stockStatus": "LOW_STOCK",
+              "supplierId": "sup-001",
+              "supplierName": "Fresh Farms Produce Ltd.",
+              "qtyOnHand": 50,
+              "qtyOnOrder": 0,
+              "inventoryStockStatus": [
+                {
+                  "qtyOnHand": 50,
+                  "qtyOnOrder": 0
+                }
+              ]
+            }
+          ]
+        },
+        "prId": "pr-quqq6fy5",
+        "pr": {
+          "id": "pr-quqq6fy5",
+          "contactNo": "000",
+          "items": [
+            {
+              "unitCost": 1250,
+              "itemCode": "ITM-FF-001",
+              "description": "Premium Fuji Apples (Box)",
+              "quantity": 2,
+              "unit": "BOX"
+            }
+          ],
+          "address": "Watermark",
+          "dateNeeded": "2026-05-21T22:10:57.7979602+08:00",
+          "purposeOfRequest": "QA E2E restock",
+          "requestedBy": "QA User",
+          "vendorCode": "SUP-001",
+          "suggestedSupplier": "Fresh Farms Produce Ltd.",
+          "requestingDept": "QA",
+          "prNumber": "PR-2026-00002",
+          "totalCost": 2500,
+          "status": "APPROVED",
+          "approvalLevel": "STORE_MANAGER",
+          "encodedBy": "Dev Administrator",
+          "createdAt": "2026-05-18T14:10:57.978Z",
+          "updatedAt": "2026-05-18T14:10:57.997Z",
+          "approvedBy": "Dev Administrator",
+          "approvedAt": "2026-05-18T14:10:57.995Z"
+        },
+        "date": "2026-05-18T14:10:58.010Z",
+        "forDepartment": "QA",
+        "requisitioner": "QA User",
+        "subtotal": 2500,
+        "taxVat": 0,
+        "total": 2500,
+        "status": "RECEIVED",
+        "preparedBy": "Dev Administrator",
+        "items": [
+          {
+            "itemNo": "ITM-FF-001",
+            "description": "Premium Fuji Apples (Box)",
+            "quantity": 2,
+            "unitPrice": 1250
+          }
+        ],
+        "createdAt": "2026-05-18T14:10:58.010Z",
+        "updatedAt": "2026-05-18T14:10:58.010Z"
+      },
+      "receivedFrom": "Fresh Farms Produce Ltd.",
+      "via": "QA Delivery",
+      "supplierId": "sup-001",
+      "poDate": "2026-05-18T14:10:58.010Z",
+      "invoiceNo": "QA-INV-001",
+      "prNumber": "PR-2026-00002",
+      "status": "VERIFIED",
+      "receivingPersonnel": "Dev Administrator",
+      "items": [
+        {
+          "unitPrice": 1250,
+          "quantity": 2,
+          "description": "Premium Fuji Apples (Box)",
+          "total": null,
+          "itemNo": "ITM-FF-001"
+        }
+      ],
+      "dateReceived": "2026-05-18T14:10:58.182Z",
+      "createdAt": "2026-05-18T14:10:58.182Z",
+      "updatedAt": "2026-05-18T14:10:58.182Z"
+    },
+    {
+      "id": "rr-001",
+      "rrNumber": "RR-2026-00001",
+      "poId": "po-001",
+      "po": {
+        "id": "po-001",
+        "poNumber": "PO-2026-00001",
+        "supplierId": "sup-002",
+        "supplier": {
+          "id": "sup-002",
+          "vendorCode": "SUP-002",
+          "name": "Unilever Philippines",
+          "address": "BGC, Taguig",
+          "contactPerson": "Juan Dela Cruz",
+          "contactDetails": "02-8888-1234",
+          "email": "distributor@unilever.ph",
+          "tin": "002-987-654-000",
+          "paymentTerms": "NET_60",
+          "creditLimit": 250000,
+          "status": "ACTIVE",
+          "isAccredited": true,
+          "accreditedDate": "2026-05-18T14:10:28.246Z",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:28.246Z"
+        },
+        "prId": "pr-001",
+        "pr": {
+          "id": "pr-001",
+          "prNumber": "PR-2026-00001",
+          "requestedBy": "Dev Administrator",
+          "requestingDept": "GROCERY",
+          "purposeOfRequest": "Restocking fast-moving personal care items",
+          "address": "Watermark Supermarket",
+          "contactNo": "123-4567",
+          "datePrepared": "2026-05-18T14:10:28.246Z",
+          "dateNeeded": "2026-05-18T14:10:28.246Z",
+          "suggestedSupplier": "Unilever Philippines",
+          "vendorCode": "SUP-002",
+          "totalCost": 15000,
+          "status": "APPROVED",
+          "approvalLevel": "STORE_MANAGER",
+          "encodedBy": "dev-admin-id",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:28.246Z",
+          "items": [
+            {
+              "id": "pri-001",
+              "itemCode": "ITM-UL-001",
+              "description": "Dove Soap Original 135g (Pack of 3)",
+              "quantity": 100,
+              "unit": "PACK",
+              "unitCost": 150,
+              "totalCost": 15000
+            }
+          ]
+        },
+        "date": "2026-05-18T14:10:28.246Z",
+        "forDepartment": "GROCERY",
+        "requisitioner": "Dev Administrator",
+        "subtotal": 15000,
+        "taxVat": 0,
+        "total": 15000,
+        "status": "OPEN",
+        "preparedBy": "Dev Administrator",
+        "createdAt": "2026-05-18T14:10:28.246Z",
+        "updatedAt": "2026-05-18T14:10:28.246Z",
+        "items": [
+          {
+            "id": "poi-001",
+            "itemNo": "ITM-UL-001",
+            "description": "Dove Soap Original 135g (Pack of 3)",
+            "quantity": 100,
+            "unitPrice": 150,
+            "amount": 15000
+          }
+        ]
+      },
+      "receivedFrom": "Unilever Philippines",
+      "via": "Direct Delivery",
+      "supplierId": "sup-002",
+      "poDate": "2026-05-18T14:10:28.246Z",
+      "invoiceNo": "INV-UL-0001",
+      "dateReceived": "2026-05-18T14:10:28.246Z",
+      "prNumber": "PR-2026-00001",
+      "status": "VERIFIED",
+      "receivingPersonnel": "Dev Administrator",
+      "createdAt": "2026-05-18T14:10:28.246Z",
+      "updatedAt": "2026-05-18T14:10:28.246Z",
+      "items": [
+        {
+          "id": "rri-001",
+          "itemNo": "ITM-UL-001",
+          "description": "Dove Soap Original 135g (Pack of 3)",
+          "quantity": 100,
+          "unitPrice": 150,
+          "total": 15000
+        }
+      ]
+    }
+  ],
+  "discrepancies": [],
+  "invoices": [
+    {
+      "id": "inv-deiwa1it",
+      "grossAmount": 2500,
+      "items": [],
+      "vatAmount": 0,
+      "totalAmountDue": 2500,
+      "invoiceNo": "QA-INV-001",
+      "netAmount": 2500,
+      "poNumber": "PO-2026-00002",
+      "rrNumber": "RR-2026-00002",
+      "dueDate": "2026-05-25T22:10:58.2425220+08:00",
+      "invoiceDate": "2026-05-18T22:10:58.2289525+08:00",
+      "supplierId": "sup-001",
+      "supplier": {
+        "id": "sup-001",
+        "vendorCode": "SUP-001",
+        "name": "Fresh Farms Produce Ltd.",
+        "address": "Benguet, Philippines",
+        "contactPerson": "Maria Clara",
+        "contactDetails": "0917-123-4567",
+        "email": "sales@freshfarms.com",
+        "tin": "001-234-567-000",
+        "paymentTerms": "NET_45",
+        "creditLimit": 150000,
+        "status": "ACTIVE",
+        "isAccredited": true,
+        "accreditedDate": "2026-05-18T14:10:28.246Z",
+        "createdAt": "2026-05-18T14:10:28.246Z",
+        "updatedAt": "2026-05-18T14:10:57.765Z",
+        "items": [
+          {
+            "id": "itm-001",
+            "itemCode": "ITM-FF-001",
+            "description": "Premium Fuji Apples (Box)",
+            "category": "PRODUCE",
+            "unit": "BOX",
+            "standardCost": 1250,
+            "reorderPoint": 50,
+            "reorderQty": 200,
+            "stockStatus": "LOW_STOCK",
+            "supplierId": "sup-001",
+            "supplierName": "Fresh Farms Produce Ltd.",
+            "qtyOnHand": 50,
+            "qtyOnOrder": 0,
+            "inventoryStockStatus": [
+              {
+                "qtyOnHand": 50,
+                "qtyOnOrder": 0
+              }
+            ]
+          }
+        ]
+      },
+      "poId": "po-3yywz55u",
+      "po": {
+        "id": "po-3yywz55u",
+        "poNumber": "PO-2026-00002",
+        "supplierId": "sup-001",
+        "supplier": {
+          "id": "sup-001",
+          "vendorCode": "SUP-001",
+          "name": "Fresh Farms Produce Ltd.",
+          "address": "Benguet, Philippines",
+          "contactPerson": "Maria Clara",
+          "contactDetails": "0917-123-4567",
+          "email": "sales@freshfarms.com",
+          "tin": "001-234-567-000",
+          "paymentTerms": "NET_45",
+          "creditLimit": 150000,
+          "status": "ACTIVE",
+          "isAccredited": true,
+          "accreditedDate": "2026-05-18T14:10:28.246Z",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:57.765Z",
+          "items": [
+            {
+              "id": "itm-001",
+              "itemCode": "ITM-FF-001",
+              "description": "Premium Fuji Apples (Box)",
+              "category": "PRODUCE",
+              "unit": "BOX",
+              "standardCost": 1250,
+              "reorderPoint": 50,
+              "reorderQty": 200,
+              "stockStatus": "LOW_STOCK",
+              "supplierId": "sup-001",
+              "supplierName": "Fresh Farms Produce Ltd.",
+              "qtyOnHand": 50,
+              "qtyOnOrder": 0,
+              "inventoryStockStatus": [
+                {
+                  "qtyOnHand": 50,
+                  "qtyOnOrder": 0
+                }
+              ]
+            }
+          ]
+        },
+        "prId": "pr-quqq6fy5",
+        "pr": {
+          "id": "pr-quqq6fy5",
+          "contactNo": "000",
+          "items": [
+            {
+              "unitCost": 1250,
+              "itemCode": "ITM-FF-001",
+              "description": "Premium Fuji Apples (Box)",
+              "quantity": 2,
+              "unit": "BOX"
+            }
+          ],
+          "address": "Watermark",
+          "dateNeeded": "2026-05-21T22:10:57.7979602+08:00",
+          "purposeOfRequest": "QA E2E restock",
+          "requestedBy": "QA User",
+          "vendorCode": "SUP-001",
+          "suggestedSupplier": "Fresh Farms Produce Ltd.",
+          "requestingDept": "QA",
+          "prNumber": "PR-2026-00002",
+          "totalCost": 2500,
+          "status": "APPROVED",
+          "approvalLevel": "STORE_MANAGER",
+          "encodedBy": "Dev Administrator",
+          "createdAt": "2026-05-18T14:10:57.978Z",
+          "updatedAt": "2026-05-18T14:10:57.997Z",
+          "approvedBy": "Dev Administrator",
+          "approvedAt": "2026-05-18T14:10:57.995Z"
+        },
+        "date": "2026-05-18T14:10:58.010Z",
+        "forDepartment": "QA",
+        "requisitioner": "QA User",
+        "subtotal": 2500,
+        "taxVat": 0,
+        "total": 2500,
+        "status": "RECEIVED",
+        "preparedBy": "Dev Administrator",
+        "items": [
+          {
+            "itemNo": "ITM-FF-001",
+            "description": "Premium Fuji Apples (Box)",
+            "quantity": 2,
+            "unitPrice": 1250
+          }
+        ],
+        "createdAt": "2026-05-18T14:10:58.010Z",
+        "updatedAt": "2026-05-18T14:10:58.010Z"
+      },
+      "rrId": "rr-j6o77i92",
+      "rr": {
+        "id": "rr-j6o77i92",
+        "rrNumber": "RR-2026-00002",
+        "poId": "po-3yywz55u",
+        "po": {
+          "id": "po-3yywz55u",
+          "poNumber": "PO-2026-00002",
+          "supplierId": "sup-001",
+          "supplier": {
+            "id": "sup-001",
+            "vendorCode": "SUP-001",
+            "name": "Fresh Farms Produce Ltd.",
+            "address": "Benguet, Philippines",
+            "contactPerson": "Maria Clara",
+            "contactDetails": "0917-123-4567",
+            "email": "sales@freshfarms.com",
+            "tin": "001-234-567-000",
+            "paymentTerms": "NET_45",
+            "creditLimit": 150000,
+            "status": "ACTIVE",
+            "isAccredited": true,
+            "accreditedDate": "2026-05-18T14:10:28.246Z",
+            "createdAt": "2026-05-18T14:10:28.246Z",
+            "updatedAt": "2026-05-18T14:10:57.765Z",
+            "items": [
+              {
+                "id": "itm-001",
+                "itemCode": "ITM-FF-001",
+                "description": "Premium Fuji Apples (Box)",
+                "category": "PRODUCE",
+                "unit": "BOX",
+                "standardCost": 1250,
+                "reorderPoint": 50,
+                "reorderQty": 200,
+                "stockStatus": "LOW_STOCK",
+                "supplierId": "sup-001",
+                "supplierName": "Fresh Farms Produce Ltd.",
+                "qtyOnHand": 50,
+                "qtyOnOrder": 0,
+                "inventoryStockStatus": [
+                  {
+                    "qtyOnHand": 50,
+                    "qtyOnOrder": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "prId": "pr-quqq6fy5",
+          "pr": {
+            "id": "pr-quqq6fy5",
+            "contactNo": "000",
+            "items": [
+              {
+                "unitCost": 1250,
+                "itemCode": "ITM-FF-001",
+                "description": "Premium Fuji Apples (Box)",
+                "quantity": 2,
+                "unit": "BOX"
+              }
+            ],
+            "address": "Watermark",
+            "dateNeeded": "2026-05-21T22:10:57.7979602+08:00",
+            "purposeOfRequest": "QA E2E restock",
+            "requestedBy": "QA User",
+            "vendorCode": "SUP-001",
+            "suggestedSupplier": "Fresh Farms Produce Ltd.",
+            "requestingDept": "QA",
+            "prNumber": "PR-2026-00002",
+            "totalCost": 2500,
+            "status": "APPROVED",
+            "approvalLevel": "STORE_MANAGER",
+            "encodedBy": "Dev Administrator",
+            "createdAt": "2026-05-18T14:10:57.978Z",
+            "updatedAt": "2026-05-18T14:10:57.997Z",
+            "approvedBy": "Dev Administrator",
+            "approvedAt": "2026-05-18T14:10:57.995Z"
+          },
+          "date": "2026-05-18T14:10:58.010Z",
+          "forDepartment": "QA",
+          "requisitioner": "QA User",
+          "subtotal": 2500,
+          "taxVat": 0,
+          "total": 2500,
+          "status": "RECEIVED",
+          "preparedBy": "Dev Administrator",
+          "items": [
+            {
+              "itemNo": "ITM-FF-001",
+              "description": "Premium Fuji Apples (Box)",
+              "quantity": 2,
+              "unitPrice": 1250
+            }
+          ],
+          "createdAt": "2026-05-18T14:10:58.010Z",
+          "updatedAt": "2026-05-18T14:10:58.010Z"
+        },
+        "receivedFrom": "Fresh Farms Produce Ltd.",
+        "via": "QA Delivery",
+        "supplierId": "sup-001",
+        "poDate": "2026-05-18T14:10:58.010Z",
+        "invoiceNo": "QA-INV-001",
+        "prNumber": "PR-2026-00002",
+        "status": "VERIFIED",
+        "receivingPersonnel": "Dev Administrator",
+        "items": [
+          {
+            "unitPrice": 1250,
+            "quantity": 2,
+            "description": "Premium Fuji Apples (Box)",
+            "total": null,
+            "itemNo": "ITM-FF-001"
+          }
+        ],
+        "dateReceived": "2026-05-18T14:10:58.182Z",
+        "createdAt": "2026-05-18T14:10:58.182Z",
+        "updatedAt": "2026-05-18T14:10:58.182Z"
+      },
+      "threeWayStatus": "MATCHED",
+      "status": "OPEN",
+      "createdAt": "2026-05-18T14:10:58.266Z",
+      "updatedAt": "2026-05-18T14:10:58.267Z"
+    },
+    {
+      "id": "inv-001",
+      "invoiceNo": "INV-UL-0001",
+      "supplierId": "sup-002",
+      "supplier": {
+        "id": "sup-002",
+        "vendorCode": "SUP-002",
+        "name": "Unilever Philippines",
+        "address": "BGC, Taguig",
+        "contactPerson": "Juan Dela Cruz",
+        "contactDetails": "02-8888-1234",
+        "email": "distributor@unilever.ph",
+        "tin": "002-987-654-000",
+        "paymentTerms": "NET_60",
+        "creditLimit": 250000,
+        "status": "ACTIVE",
+        "isAccredited": true,
+        "accreditedDate": "2026-05-18T14:10:28.246Z",
+        "createdAt": "2026-05-18T14:10:28.246Z",
+        "updatedAt": "2026-05-18T14:10:28.246Z"
+      },
+      "poId": "po-001",
+      "po": {
+        "id": "po-001",
+        "poNumber": "PO-2026-00001",
+        "supplierId": "sup-002",
+        "supplier": {
+          "id": "sup-002",
+          "vendorCode": "SUP-002",
+          "name": "Unilever Philippines",
+          "address": "BGC, Taguig",
+          "contactPerson": "Juan Dela Cruz",
+          "contactDetails": "02-8888-1234",
+          "email": "distributor@unilever.ph",
+          "tin": "002-987-654-000",
+          "paymentTerms": "NET_60",
+          "creditLimit": 250000,
+          "status": "ACTIVE",
+          "isAccredited": true,
+          "accreditedDate": "2026-05-18T14:10:28.246Z",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:28.246Z"
+        },
+        "prId": "pr-001",
+        "pr": {
+          "id": "pr-001",
+          "prNumber": "PR-2026-00001",
+          "requestedBy": "Dev Administrator",
+          "requestingDept": "GROCERY",
+          "purposeOfRequest": "Restocking fast-moving personal care items",
+          "address": "Watermark Supermarket",
+          "contactNo": "123-4567",
+          "datePrepared": "2026-05-18T14:10:28.246Z",
+          "dateNeeded": "2026-05-18T14:10:28.246Z",
+          "suggestedSupplier": "Unilever Philippines",
+          "vendorCode": "SUP-002",
+          "totalCost": 15000,
+          "status": "APPROVED",
+          "approvalLevel": "STORE_MANAGER",
+          "encodedBy": "dev-admin-id",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:28.246Z",
+          "items": [
+            {
+              "id": "pri-001",
+              "itemCode": "ITM-UL-001",
+              "description": "Dove Soap Original 135g (Pack of 3)",
+              "quantity": 100,
+              "unit": "PACK",
+              "unitCost": 150,
+              "totalCost": 15000
+            }
+          ]
+        },
+        "date": "2026-05-18T14:10:28.246Z",
+        "forDepartment": "GROCERY",
+        "requisitioner": "Dev Administrator",
+        "subtotal": 15000,
+        "taxVat": 0,
+        "total": 15000,
+        "status": "OPEN",
+        "preparedBy": "Dev Administrator",
+        "createdAt": "2026-05-18T14:10:28.246Z",
+        "updatedAt": "2026-05-18T14:10:28.246Z",
+        "items": [
+          {
+            "id": "poi-001",
+            "itemNo": "ITM-UL-001",
+            "description": "Dove Soap Original 135g (Pack of 3)",
+            "quantity": 100,
+            "unitPrice": 150,
+            "amount": 15000
+          }
+        ]
+      },
+      "rrId": "rr-001",
+      "rr": {
+        "id": "rr-001",
+        "rrNumber": "RR-2026-00001",
+        "poId": "po-001",
+        "po": {
+          "id": "po-001",
+          "poNumber": "PO-2026-00001",
+          "supplierId": "sup-002",
+          "supplier": {
+            "id": "sup-002",
+            "vendorCode": "SUP-002",
+            "name": "Unilever Philippines",
+            "address": "BGC, Taguig",
+            "contactPerson": "Juan Dela Cruz",
+            "contactDetails": "02-8888-1234",
+            "email": "distributor@unilever.ph",
+            "tin": "002-987-654-000",
+            "paymentTerms": "NET_60",
+            "creditLimit": 250000,
+            "status": "ACTIVE",
+            "isAccredited": true,
+            "accreditedDate": "2026-05-18T14:10:28.246Z",
+            "createdAt": "2026-05-18T14:10:28.246Z",
+            "updatedAt": "2026-05-18T14:10:28.246Z"
+          },
+          "prId": "pr-001",
+          "pr": {
+            "id": "pr-001",
+            "prNumber": "PR-2026-00001",
+            "requestedBy": "Dev Administrator",
+            "requestingDept": "GROCERY",
+            "purposeOfRequest": "Restocking fast-moving personal care items",
+            "address": "Watermark Supermarket",
+            "contactNo": "123-4567",
+            "datePrepared": "2026-05-18T14:10:28.246Z",
+            "dateNeeded": "2026-05-18T14:10:28.246Z",
+            "suggestedSupplier": "Unilever Philippines",
+            "vendorCode": "SUP-002",
+            "totalCost": 15000,
+            "status": "APPROVED",
+            "approvalLevel": "STORE_MANAGER",
+            "encodedBy": "dev-admin-id",
+            "createdAt": "2026-05-18T14:10:28.246Z",
+            "updatedAt": "2026-05-18T14:10:28.246Z",
+            "items": [
+              {
+                "id": "pri-001",
+                "itemCode": "ITM-UL-001",
+                "description": "Dove Soap Original 135g (Pack of 3)",
+                "quantity": 100,
+                "unit": "PACK",
+                "unitCost": 150,
+                "totalCost": 15000
+              }
+            ]
+          },
+          "date": "2026-05-18T14:10:28.246Z",
+          "forDepartment": "GROCERY",
+          "requisitioner": "Dev Administrator",
+          "subtotal": 15000,
+          "taxVat": 0,
+          "total": 15000,
+          "status": "OPEN",
+          "preparedBy": "Dev Administrator",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:28.246Z",
+          "items": [
+            {
+              "id": "poi-001",
+              "itemNo": "ITM-UL-001",
+              "description": "Dove Soap Original 135g (Pack of 3)",
+              "quantity": 100,
+              "unitPrice": 150,
+              "amount": 15000
+            }
+          ]
+        },
+        "receivedFrom": "Unilever Philippines",
+        "via": "Direct Delivery",
+        "supplierId": "sup-002",
+        "poDate": "2026-05-18T14:10:28.246Z",
+        "invoiceNo": "INV-UL-0001",
+        "dateReceived": "2026-05-18T14:10:28.246Z",
+        "prNumber": "PR-2026-00001",
+        "status": "VERIFIED",
+        "receivingPersonnel": "Dev Administrator",
+        "createdAt": "2026-05-18T14:10:28.246Z",
+        "updatedAt": "2026-05-18T14:10:28.246Z",
+        "items": [
+          {
+            "id": "rri-001",
+            "itemNo": "ITM-UL-001",
+            "description": "Dove Soap Original 135g (Pack of 3)",
+            "quantity": 100,
+            "unitPrice": 150,
+            "total": 15000
+          }
+        ]
+      },
+      "invoiceDate": "2026-05-18T14:10:28.246Z",
+      "dueDate": "2026-05-25T14:10:28.246Z",
+      "grossAmount": 15000,
+      "discount": 0,
+      "netAmount": 15000,
+      "vatAmount": 0,
+      "totalAmountDue": 15000,
+      "threeWayStatus": "MATCHED",
+      "status": "APPROVED",
+      "createdAt": "2026-05-18T14:10:28.246Z",
+      "updatedAt": "2026-05-18T14:10:28.246Z",
+      "items": [
+        {
+          "id": "invi-001",
+          "no": 1,
+          "description": "Dove Soap Original 135g (Pack of 3)",
+          "qty": 100,
+          "unit": "PACK",
+          "unitPrice": 150,
+          "amount": 15000
+        }
+      ]
+    }
+  ],
+  "vouchers": [
+    {
+      "id": "vch-rggsxqx6",
+      "voucherNo": "CV-2026-00002",
+      "voucherType": "CHECK",
+      "invoiceId": "inv-deiwa1it",
+      "invoice": {
+        "id": "inv-deiwa1it",
+        "grossAmount": 2500,
+        "items": [],
+        "vatAmount": 0,
+        "totalAmountDue": 2500,
+        "invoiceNo": "QA-INV-001",
+        "netAmount": 2500,
+        "poNumber": "PO-2026-00002",
+        "rrNumber": "RR-2026-00002",
+        "dueDate": "2026-05-25T22:10:58.2425220+08:00",
+        "invoiceDate": "2026-05-18T22:10:58.2289525+08:00",
+        "supplierId": "sup-001",
+        "supplier": {
+          "id": "sup-001",
+          "vendorCode": "SUP-001",
+          "name": "Fresh Farms Produce Ltd.",
+          "address": "Benguet, Philippines",
+          "contactPerson": "Maria Clara",
+          "contactDetails": "0917-123-4567",
+          "email": "sales@freshfarms.com",
+          "tin": "001-234-567-000",
+          "paymentTerms": "NET_45",
+          "creditLimit": 150000,
+          "status": "ACTIVE",
+          "isAccredited": true,
+          "accreditedDate": "2026-05-18T14:10:28.246Z",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:57.765Z",
+          "items": [
+            {
+              "id": "itm-001",
+              "itemCode": "ITM-FF-001",
+              "description": "Premium Fuji Apples (Box)",
+              "category": "PRODUCE",
+              "unit": "BOX",
+              "standardCost": 1250,
+              "reorderPoint": 50,
+              "reorderQty": 200,
+              "stockStatus": "LOW_STOCK",
+              "supplierId": "sup-001",
+              "supplierName": "Fresh Farms Produce Ltd.",
+              "qtyOnHand": 50,
+              "qtyOnOrder": 0,
+              "inventoryStockStatus": [
+                {
+                  "qtyOnHand": 50,
+                  "qtyOnOrder": 0
+                }
+              ]
+            }
+          ]
+        },
+        "poId": "po-3yywz55u",
+        "po": {
+          "id": "po-3yywz55u",
+          "poNumber": "PO-2026-00002",
+          "supplierId": "sup-001",
+          "supplier": {
+            "id": "sup-001",
+            "vendorCode": "SUP-001",
+            "name": "Fresh Farms Produce Ltd.",
+            "address": "Benguet, Philippines",
+            "contactPerson": "Maria Clara",
+            "contactDetails": "0917-123-4567",
+            "email": "sales@freshfarms.com",
+            "tin": "001-234-567-000",
+            "paymentTerms": "NET_45",
+            "creditLimit": 150000,
+            "status": "ACTIVE",
+            "isAccredited": true,
+            "accreditedDate": "2026-05-18T14:10:28.246Z",
+            "createdAt": "2026-05-18T14:10:28.246Z",
+            "updatedAt": "2026-05-18T14:10:57.765Z",
+            "items": [
+              {
+                "id": "itm-001",
+                "itemCode": "ITM-FF-001",
+                "description": "Premium Fuji Apples (Box)",
+                "category": "PRODUCE",
+                "unit": "BOX",
+                "standardCost": 1250,
+                "reorderPoint": 50,
+                "reorderQty": 200,
+                "stockStatus": "LOW_STOCK",
+                "supplierId": "sup-001",
+                "supplierName": "Fresh Farms Produce Ltd.",
+                "qtyOnHand": 50,
+                "qtyOnOrder": 0,
+                "inventoryStockStatus": [
+                  {
+                    "qtyOnHand": 50,
+                    "qtyOnOrder": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "prId": "pr-quqq6fy5",
+          "pr": {
+            "id": "pr-quqq6fy5",
+            "contactNo": "000",
+            "items": [
+              {
+                "unitCost": 1250,
+                "itemCode": "ITM-FF-001",
+                "description": "Premium Fuji Apples (Box)",
+                "quantity": 2,
+                "unit": "BOX"
+              }
+            ],
+            "address": "Watermark",
+            "dateNeeded": "2026-05-21T22:10:57.7979602+08:00",
+            "purposeOfRequest": "QA E2E restock",
+            "requestedBy": "QA User",
+            "vendorCode": "SUP-001",
+            "suggestedSupplier": "Fresh Farms Produce Ltd.",
+            "requestingDept": "QA",
+            "prNumber": "PR-2026-00002",
+            "totalCost": 2500,
+            "status": "APPROVED",
+            "approvalLevel": "STORE_MANAGER",
+            "encodedBy": "Dev Administrator",
+            "createdAt": "2026-05-18T14:10:57.978Z",
+            "updatedAt": "2026-05-18T14:10:57.997Z",
+            "approvedBy": "Dev Administrator",
+            "approvedAt": "2026-05-18T14:10:57.995Z"
+          },
+          "date": "2026-05-18T14:10:58.010Z",
+          "forDepartment": "QA",
+          "requisitioner": "QA User",
+          "subtotal": 2500,
+          "taxVat": 0,
+          "total": 2500,
+          "status": "RECEIVED",
+          "preparedBy": "Dev Administrator",
+          "items": [
+            {
+              "itemNo": "ITM-FF-001",
+              "description": "Premium Fuji Apples (Box)",
+              "quantity": 2,
+              "unitPrice": 1250
+            }
+          ],
+          "createdAt": "2026-05-18T14:10:58.010Z",
+          "updatedAt": "2026-05-18T14:10:58.010Z"
+        },
+        "rrId": "rr-j6o77i92",
+        "rr": {
+          "id": "rr-j6o77i92",
+          "rrNumber": "RR-2026-00002",
+          "poId": "po-3yywz55u",
+          "po": {
+            "id": "po-3yywz55u",
+            "poNumber": "PO-2026-00002",
+            "supplierId": "sup-001",
+            "supplier": {
+              "id": "sup-001",
+              "vendorCode": "SUP-001",
+              "name": "Fresh Farms Produce Ltd.",
+              "address": "Benguet, Philippines",
+              "contactPerson": "Maria Clara",
+              "contactDetails": "0917-123-4567",
+              "email": "sales@freshfarms.com",
+              "tin": "001-234-567-000",
+              "paymentTerms": "NET_45",
+              "creditLimit": 150000,
+              "status": "ACTIVE",
+              "isAccredited": true,
+              "accreditedDate": "2026-05-18T14:10:28.246Z",
+              "createdAt": "2026-05-18T14:10:28.246Z",
+              "updatedAt": "2026-05-18T14:10:57.765Z",
+              "items": [
+                {
+                  "id": "itm-001",
+                  "itemCode": "ITM-FF-001",
+                  "description": "Premium Fuji Apples (Box)",
+                  "category": "PRODUCE",
+                  "unit": "BOX",
+                  "standardCost": 1250,
+                  "reorderPoint": 50,
+                  "reorderQty": 200,
+                  "stockStatus": "LOW_STOCK",
+                  "supplierId": "sup-001",
+                  "supplierName": "Fresh Farms Produce Ltd.",
+                  "qtyOnHand": 50,
+                  "qtyOnOrder": 0,
+                  "inventoryStockStatus": [
+                    {
+                      "qtyOnHand": 50,
+                      "qtyOnOrder": 0
+                    }
+                  ]
+                }
+              ]
+            },
+            "prId": "pr-quqq6fy5",
+            "pr": {
+              "id": "pr-quqq6fy5",
+              "contactNo": "000",
+              "items": [
+                {
+                  "unitCost": 1250,
+                  "itemCode": "ITM-FF-001",
+                  "description": "Premium Fuji Apples (Box)",
+                  "quantity": 2,
+                  "unit": "BOX"
+                }
+              ],
+              "address": "Watermark",
+              "dateNeeded": "2026-05-21T22:10:57.7979602+08:00",
+              "purposeOfRequest": "QA E2E restock",
+              "requestedBy": "QA User",
+              "vendorCode": "SUP-001",
+              "suggestedSupplier": "Fresh Farms Produce Ltd.",
+              "requestingDept": "QA",
+              "prNumber": "PR-2026-00002",
+              "totalCost": 2500,
+              "status": "APPROVED",
+              "approvalLevel": "STORE_MANAGER",
+              "encodedBy": "Dev Administrator",
+              "createdAt": "2026-05-18T14:10:57.978Z",
+              "updatedAt": "2026-05-18T14:10:57.997Z",
+              "approvedBy": "Dev Administrator",
+              "approvedAt": "2026-05-18T14:10:57.995Z"
+            },
+            "date": "2026-05-18T14:10:58.010Z",
+            "forDepartment": "QA",
+            "requisitioner": "QA User",
+            "subtotal": 2500,
+            "taxVat": 0,
+            "total": 2500,
+            "status": "RECEIVED",
+            "preparedBy": "Dev Administrator",
+            "items": [
+              {
+                "itemNo": "ITM-FF-001",
+                "description": "Premium Fuji Apples (Box)",
+                "quantity": 2,
+                "unitPrice": 1250
+              }
+            ],
+            "createdAt": "2026-05-18T14:10:58.010Z",
+            "updatedAt": "2026-05-18T14:10:58.010Z"
+          },
+          "receivedFrom": "Fresh Farms Produce Ltd.",
+          "via": "QA Delivery",
+          "supplierId": "sup-001",
+          "poDate": "2026-05-18T14:10:58.010Z",
+          "invoiceNo": "QA-INV-001",
+          "prNumber": "PR-2026-00002",
+          "status": "VERIFIED",
+          "receivingPersonnel": "Dev Administrator",
+          "items": [
+            {
+              "unitPrice": 1250,
+              "quantity": 2,
+              "description": "Premium Fuji Apples (Box)",
+              "total": null,
+              "itemNo": "ITM-FF-001"
+            }
+          ],
+          "dateReceived": "2026-05-18T14:10:58.182Z",
+          "createdAt": "2026-05-18T14:10:58.182Z",
+          "updatedAt": "2026-05-18T14:10:58.182Z"
+        },
+        "threeWayStatus": "MATCHED",
+        "status": "PAID",
+        "createdAt": "2026-05-18T14:10:58.266Z",
+        "updatedAt": "2026-05-18T14:10:58.267Z"
+      },
+      "payee": "Fresh Farms Produce Ltd.",
+      "payeeAddress": "Benguet, Philippines",
+      "amountFigures": 2500,
+      "amountWords": "QA Amount",
+      "modeOfPayment": "CHECK",
+      "explanation": "Payment for Invoice QA-INV-001",
+      "debitTotal": 2500,
+      "creditTotal": 2500,
+      "status": "DISBURSED",
+      "preparedBy": "Dev Administrator",
+      "entries": [],
+      "createdAt": "2026-05-18T14:10:58.286Z",
+      "updatedAt": "2026-05-18T14:10:58.318Z",
+      "approvedBy": "Dev Administrator",
+      "approvedAt": "2026-05-18T14:10:58.315Z"
+    },
+    {
+      "id": "vch-001",
+      "voucherNo": "CV-2026-00001",
+      "voucherType": "CHECK",
+      "invoiceId": "inv-001",
+      "invoice": {
+        "id": "inv-001",
+        "invoiceNo": "INV-UL-0001",
+        "supplierId": "sup-002",
+        "supplier": {
+          "id": "sup-002",
+          "vendorCode": "SUP-002",
+          "name": "Unilever Philippines",
+          "address": "BGC, Taguig",
+          "contactPerson": "Juan Dela Cruz",
+          "contactDetails": "02-8888-1234",
+          "email": "distributor@unilever.ph",
+          "tin": "002-987-654-000",
+          "paymentTerms": "NET_60",
+          "creditLimit": 250000,
+          "status": "ACTIVE",
+          "isAccredited": true,
+          "accreditedDate": "2026-05-18T14:10:28.246Z",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:28.246Z"
+        },
+        "poId": "po-001",
+        "po": {
+          "id": "po-001",
+          "poNumber": "PO-2026-00001",
+          "supplierId": "sup-002",
+          "supplier": {
+            "id": "sup-002",
+            "vendorCode": "SUP-002",
+            "name": "Unilever Philippines",
+            "address": "BGC, Taguig",
+            "contactPerson": "Juan Dela Cruz",
+            "contactDetails": "02-8888-1234",
+            "email": "distributor@unilever.ph",
+            "tin": "002-987-654-000",
+            "paymentTerms": "NET_60",
+            "creditLimit": 250000,
+            "status": "ACTIVE",
+            "isAccredited": true,
+            "accreditedDate": "2026-05-18T14:10:28.246Z",
+            "createdAt": "2026-05-18T14:10:28.246Z",
+            "updatedAt": "2026-05-18T14:10:28.246Z"
+          },
+          "prId": "pr-001",
+          "pr": {
+            "id": "pr-001",
+            "prNumber": "PR-2026-00001",
+            "requestedBy": "Dev Administrator",
+            "requestingDept": "GROCERY",
+            "purposeOfRequest": "Restocking fast-moving personal care items",
+            "address": "Watermark Supermarket",
+            "contactNo": "123-4567",
+            "datePrepared": "2026-05-18T14:10:28.246Z",
+            "dateNeeded": "2026-05-18T14:10:28.246Z",
+            "suggestedSupplier": "Unilever Philippines",
+            "vendorCode": "SUP-002",
+            "totalCost": 15000,
+            "status": "APPROVED",
+            "approvalLevel": "STORE_MANAGER",
+            "encodedBy": "dev-admin-id",
+            "createdAt": "2026-05-18T14:10:28.246Z",
+            "updatedAt": "2026-05-18T14:10:28.246Z",
+            "items": [
+              {
+                "id": "pri-001",
+                "itemCode": "ITM-UL-001",
+                "description": "Dove Soap Original 135g (Pack of 3)",
+                "quantity": 100,
+                "unit": "PACK",
+                "unitCost": 150,
+                "totalCost": 15000
+              }
+            ]
+          },
+          "date": "2026-05-18T14:10:28.246Z",
+          "forDepartment": "GROCERY",
+          "requisitioner": "Dev Administrator",
+          "subtotal": 15000,
+          "taxVat": 0,
+          "total": 15000,
+          "status": "OPEN",
+          "preparedBy": "Dev Administrator",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:28.246Z",
+          "items": [
+            {
+              "id": "poi-001",
+              "itemNo": "ITM-UL-001",
+              "description": "Dove Soap Original 135g (Pack of 3)",
+              "quantity": 100,
+              "unitPrice": 150,
+              "amount": 15000
+            }
+          ]
+        },
+        "rrId": "rr-001",
+        "rr": {
+          "id": "rr-001",
+          "rrNumber": "RR-2026-00001",
+          "poId": "po-001",
+          "po": {
+            "id": "po-001",
+            "poNumber": "PO-2026-00001",
+            "supplierId": "sup-002",
+            "supplier": {
+              "id": "sup-002",
+              "vendorCode": "SUP-002",
+              "name": "Unilever Philippines",
+              "address": "BGC, Taguig",
+              "contactPerson": "Juan Dela Cruz",
+              "contactDetails": "02-8888-1234",
+              "email": "distributor@unilever.ph",
+              "tin": "002-987-654-000",
+              "paymentTerms": "NET_60",
+              "creditLimit": 250000,
+              "status": "ACTIVE",
+              "isAccredited": true,
+              "accreditedDate": "2026-05-18T14:10:28.246Z",
+              "createdAt": "2026-05-18T14:10:28.246Z",
+              "updatedAt": "2026-05-18T14:10:28.246Z"
+            },
+            "prId": "pr-001",
+            "pr": {
+              "id": "pr-001",
+              "prNumber": "PR-2026-00001",
+              "requestedBy": "Dev Administrator",
+              "requestingDept": "GROCERY",
+              "purposeOfRequest": "Restocking fast-moving personal care items",
+              "address": "Watermark Supermarket",
+              "contactNo": "123-4567",
+              "datePrepared": "2026-05-18T14:10:28.246Z",
+              "dateNeeded": "2026-05-18T14:10:28.246Z",
+              "suggestedSupplier": "Unilever Philippines",
+              "vendorCode": "SUP-002",
+              "totalCost": 15000,
+              "status": "APPROVED",
+              "approvalLevel": "STORE_MANAGER",
+              "encodedBy": "dev-admin-id",
+              "createdAt": "2026-05-18T14:10:28.246Z",
+              "updatedAt": "2026-05-18T14:10:28.246Z",
+              "items": [
+                {
+                  "id": "pri-001",
+                  "itemCode": "ITM-UL-001",
+                  "description": "Dove Soap Original 135g (Pack of 3)",
+                  "quantity": 100,
+                  "unit": "PACK",
+                  "unitCost": 150,
+                  "totalCost": 15000
+                }
+              ]
+            },
+            "date": "2026-05-18T14:10:28.246Z",
+            "forDepartment": "GROCERY",
+            "requisitioner": "Dev Administrator",
+            "subtotal": 15000,
+            "taxVat": 0,
+            "total": 15000,
+            "status": "OPEN",
+            "preparedBy": "Dev Administrator",
+            "createdAt": "2026-05-18T14:10:28.246Z",
+            "updatedAt": "2026-05-18T14:10:28.246Z",
+            "items": [
+              {
+                "id": "poi-001",
+                "itemNo": "ITM-UL-001",
+                "description": "Dove Soap Original 135g (Pack of 3)",
+                "quantity": 100,
+                "unitPrice": 150,
+                "amount": 15000
+              }
+            ]
+          },
+          "receivedFrom": "Unilever Philippines",
+          "via": "Direct Delivery",
+          "supplierId": "sup-002",
+          "poDate": "2026-05-18T14:10:28.246Z",
+          "invoiceNo": "INV-UL-0001",
+          "dateReceived": "2026-05-18T14:10:28.246Z",
+          "prNumber": "PR-2026-00001",
+          "status": "VERIFIED",
+          "receivingPersonnel": "Dev Administrator",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:28.246Z",
+          "items": [
+            {
+              "id": "rri-001",
+              "itemNo": "ITM-UL-001",
+              "description": "Dove Soap Original 135g (Pack of 3)",
+              "quantity": 100,
+              "unitPrice": 150,
+              "total": 15000
+            }
+          ]
+        },
+        "invoiceDate": "2026-05-18T14:10:28.246Z",
+        "dueDate": "2026-05-25T14:10:28.246Z",
+        "grossAmount": 15000,
+        "discount": 0,
+        "netAmount": 15000,
+        "vatAmount": 0,
+        "totalAmountDue": 15000,
+        "threeWayStatus": "MATCHED",
+        "status": "APPROVED",
+        "createdAt": "2026-05-18T14:10:28.246Z",
+        "updatedAt": "2026-05-18T14:10:28.246Z",
+        "items": [
+          {
+            "id": "invi-001",
+            "no": 1,
+            "description": "Dove Soap Original 135g (Pack of 3)",
+            "qty": 100,
+            "unit": "PACK",
+            "unitPrice": 150,
+            "amount": 15000
+          }
+        ]
+      },
+      "payee": "Unilever Philippines",
+      "payeeAddress": "BGC, Taguig",
+      "amountFigures": 15000,
+      "amountWords": "Fifteen Thousand Pesos Only",
+      "modeOfPayment": "CHECK",
+      "explanation": "Payment for INV-UL-0001",
+      "debitTotal": 15000,
+      "creditTotal": 15000,
+      "status": "APPROVED",
+      "preparedBy": "Dev Administrator",
+      "approvedBy": "Dev Administrator",
+      "approvedAt": "2026-05-18T14:10:28.246Z",
+      "createdAt": "2026-05-18T14:10:28.246Z",
+      "updatedAt": "2026-05-18T14:10:28.246Z",
+      "entries": [
+        {
+          "particulars": "Accounts Payable",
+          "debit": 15000,
+          "credit": 0
+        },
+        {
+          "particulars": "Cash in Bank",
+          "debit": 0,
+          "credit": 15000
+        }
+      ]
+    }
+  ],
+  "payments": [
+    {
+      "id": "pay-36gpc8ob",
+      "voucherId": "vch-rggsxqx6",
+      "voucher": {
+        "id": "vch-rggsxqx6",
+        "voucherNo": "CV-2026-00002",
+        "voucherType": "CHECK",
+        "invoiceId": "inv-deiwa1it",
+        "invoice": {
+          "id": "inv-deiwa1it",
+          "grossAmount": 2500,
+          "items": [],
+          "vatAmount": 0,
+          "totalAmountDue": 2500,
+          "invoiceNo": "QA-INV-001",
+          "netAmount": 2500,
+          "poNumber": "PO-2026-00002",
+          "rrNumber": "RR-2026-00002",
+          "dueDate": "2026-05-25T22:10:58.2425220+08:00",
+          "invoiceDate": "2026-05-18T22:10:58.2289525+08:00",
+          "supplierId": "sup-001",
+          "supplier": {
+            "id": "sup-001",
+            "vendorCode": "SUP-001",
+            "name": "Fresh Farms Produce Ltd.",
+            "address": "Benguet, Philippines",
+            "contactPerson": "Maria Clara",
+            "contactDetails": "0917-123-4567",
+            "email": "sales@freshfarms.com",
+            "tin": "001-234-567-000",
+            "paymentTerms": "NET_45",
+            "creditLimit": 150000,
+            "status": "ACTIVE",
+            "isAccredited": true,
+            "accreditedDate": "2026-05-18T14:10:28.246Z",
+            "createdAt": "2026-05-18T14:10:28.246Z",
+            "updatedAt": "2026-05-18T14:10:57.765Z",
+            "items": [
+              {
+                "id": "itm-001",
+                "itemCode": "ITM-FF-001",
+                "description": "Premium Fuji Apples (Box)",
+                "category": "PRODUCE",
+                "unit": "BOX",
+                "standardCost": 1250,
+                "reorderPoint": 50,
+                "reorderQty": 200,
+                "stockStatus": "LOW_STOCK",
+                "supplierId": "sup-001",
+                "supplierName": "Fresh Farms Produce Ltd.",
+                "qtyOnHand": 50,
+                "qtyOnOrder": 0,
+                "inventoryStockStatus": [
+                  {
+                    "qtyOnHand": 50,
+                    "qtyOnOrder": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "poId": "po-3yywz55u",
+          "po": {
+            "id": "po-3yywz55u",
+            "poNumber": "PO-2026-00002",
+            "supplierId": "sup-001",
+            "supplier": {
+              "id": "sup-001",
+              "vendorCode": "SUP-001",
+              "name": "Fresh Farms Produce Ltd.",
+              "address": "Benguet, Philippines",
+              "contactPerson": "Maria Clara",
+              "contactDetails": "0917-123-4567",
+              "email": "sales@freshfarms.com",
+              "tin": "001-234-567-000",
+              "paymentTerms": "NET_45",
+              "creditLimit": 150000,
+              "status": "ACTIVE",
+              "isAccredited": true,
+              "accreditedDate": "2026-05-18T14:10:28.246Z",
+              "createdAt": "2026-05-18T14:10:28.246Z",
+              "updatedAt": "2026-05-18T14:10:57.765Z",
+              "items": [
+                {
+                  "id": "itm-001",
+                  "itemCode": "ITM-FF-001",
+                  "description": "Premium Fuji Apples (Box)",
+                  "category": "PRODUCE",
+                  "unit": "BOX",
+                  "standardCost": 1250,
+                  "reorderPoint": 50,
+                  "reorderQty": 200,
+                  "stockStatus": "LOW_STOCK",
+                  "supplierId": "sup-001",
+                  "supplierName": "Fresh Farms Produce Ltd.",
+                  "qtyOnHand": 50,
+                  "qtyOnOrder": 0,
+                  "inventoryStockStatus": [
+                    {
+                      "qtyOnHand": 50,
+                      "qtyOnOrder": 0
+                    }
+                  ]
+                }
+              ]
+            },
+            "prId": "pr-quqq6fy5",
+            "pr": {
+              "id": "pr-quqq6fy5",
+              "contactNo": "000",
+              "items": [
+                {
+                  "unitCost": 1250,
+                  "itemCode": "ITM-FF-001",
+                  "description": "Premium Fuji Apples (Box)",
+                  "quantity": 2,
+                  "unit": "BOX"
+                }
+              ],
+              "address": "Watermark",
+              "dateNeeded": "2026-05-21T22:10:57.7979602+08:00",
+              "purposeOfRequest": "QA E2E restock",
+              "requestedBy": "QA User",
+              "vendorCode": "SUP-001",
+              "suggestedSupplier": "Fresh Farms Produce Ltd.",
+              "requestingDept": "QA",
+              "prNumber": "PR-2026-00002",
+              "totalCost": 2500,
+              "status": "APPROVED",
+              "approvalLevel": "STORE_MANAGER",
+              "encodedBy": "Dev Administrator",
+              "createdAt": "2026-05-18T14:10:57.978Z",
+              "updatedAt": "2026-05-18T14:10:57.997Z",
+              "approvedBy": "Dev Administrator",
+              "approvedAt": "2026-05-18T14:10:57.995Z"
+            },
+            "date": "2026-05-18T14:10:58.010Z",
+            "forDepartment": "QA",
+            "requisitioner": "QA User",
+            "subtotal": 2500,
+            "taxVat": 0,
+            "total": 2500,
+            "status": "RECEIVED",
+            "preparedBy": "Dev Administrator",
+            "items": [
+              {
+                "itemNo": "ITM-FF-001",
+                "description": "Premium Fuji Apples (Box)",
+                "quantity": 2,
+                "unitPrice": 1250
+              }
+            ],
+            "createdAt": "2026-05-18T14:10:58.010Z",
+            "updatedAt": "2026-05-18T14:10:58.010Z"
+          },
+          "rrId": "rr-j6o77i92",
+          "rr": {
+            "id": "rr-j6o77i92",
+            "rrNumber": "RR-2026-00002",
+            "poId": "po-3yywz55u",
+            "po": {
+              "id": "po-3yywz55u",
+              "poNumber": "PO-2026-00002",
+              "supplierId": "sup-001",
+              "supplier": {
+                "id": "sup-001",
+                "vendorCode": "SUP-001",
+                "name": "Fresh Farms Produce Ltd.",
+                "address": "Benguet, Philippines",
+                "contactPerson": "Maria Clara",
+                "contactDetails": "0917-123-4567",
+                "email": "sales@freshfarms.com",
+                "tin": "001-234-567-000",
+                "paymentTerms": "NET_45",
+                "creditLimit": 150000,
+                "status": "ACTIVE",
+                "isAccredited": true,
+                "accreditedDate": "2026-05-18T14:10:28.246Z",
+                "createdAt": "2026-05-18T14:10:28.246Z",
+                "updatedAt": "2026-05-18T14:10:57.765Z",
+                "items": [
+                  {
+                    "id": "itm-001",
+                    "itemCode": "ITM-FF-001",
+                    "description": "Premium Fuji Apples (Box)",
+                    "category": "PRODUCE",
+                    "unit": "BOX",
+                    "standardCost": 1250,
+                    "reorderPoint": 50,
+                    "reorderQty": 200,
+                    "stockStatus": "LOW_STOCK",
+                    "supplierId": "sup-001",
+                    "supplierName": "Fresh Farms Produce Ltd.",
+                    "qtyOnHand": 50,
+                    "qtyOnOrder": 0,
+                    "inventoryStockStatus": [
+                      {
+                        "qtyOnHand": 50,
+                        "qtyOnOrder": 0
+                      }
+                    ]
+                  }
+                ]
+              },
+              "prId": "pr-quqq6fy5",
+              "pr": {
+                "id": "pr-quqq6fy5",
+                "contactNo": "000",
+                "items": [
+                  {
+                    "unitCost": 1250,
+                    "itemCode": "ITM-FF-001",
+                    "description": "Premium Fuji Apples (Box)",
+                    "quantity": 2,
+                    "unit": "BOX"
+                  }
+                ],
+                "address": "Watermark",
+                "dateNeeded": "2026-05-21T22:10:57.7979602+08:00",
+                "purposeOfRequest": "QA E2E restock",
+                "requestedBy": "QA User",
+                "vendorCode": "SUP-001",
+                "suggestedSupplier": "Fresh Farms Produce Ltd.",
+                "requestingDept": "QA",
+                "prNumber": "PR-2026-00002",
+                "totalCost": 2500,
+                "status": "APPROVED",
+                "approvalLevel": "STORE_MANAGER",
+                "encodedBy": "Dev Administrator",
+                "createdAt": "2026-05-18T14:10:57.978Z",
+                "updatedAt": "2026-05-18T14:10:57.997Z",
+                "approvedBy": "Dev Administrator",
+                "approvedAt": "2026-05-18T14:10:57.995Z"
+              },
+              "date": "2026-05-18T14:10:58.010Z",
+              "forDepartment": "QA",
+              "requisitioner": "QA User",
+              "subtotal": 2500,
+              "taxVat": 0,
+              "total": 2500,
+              "status": "RECEIVED",
+              "preparedBy": "Dev Administrator",
+              "items": [
+                {
+                  "itemNo": "ITM-FF-001",
+                  "description": "Premium Fuji Apples (Box)",
+                  "quantity": 2,
+                  "unitPrice": 1250
+                }
+              ],
+              "createdAt": "2026-05-18T14:10:58.010Z",
+              "updatedAt": "2026-05-18T14:10:58.010Z"
+            },
+            "receivedFrom": "Fresh Farms Produce Ltd.",
+            "via": "QA Delivery",
+            "supplierId": "sup-001",
+            "poDate": "2026-05-18T14:10:58.010Z",
+            "invoiceNo": "QA-INV-001",
+            "prNumber": "PR-2026-00002",
+            "status": "VERIFIED",
+            "receivingPersonnel": "Dev Administrator",
+            "items": [
+              {
+                "unitPrice": 1250,
+                "quantity": 2,
+                "description": "Premium Fuji Apples (Box)",
+                "total": null,
+                "itemNo": "ITM-FF-001"
+              }
+            ],
+            "dateReceived": "2026-05-18T14:10:58.182Z",
+            "createdAt": "2026-05-18T14:10:58.182Z",
+            "updatedAt": "2026-05-18T14:10:58.182Z"
+          },
+          "threeWayStatus": "MATCHED",
+          "status": "PAID",
+          "createdAt": "2026-05-18T14:10:58.266Z",
+          "updatedAt": "2026-05-18T14:10:58.267Z"
+        },
+        "payee": "Fresh Farms Produce Ltd.",
+        "payeeAddress": "Benguet, Philippines",
+        "amountFigures": 2500,
+        "amountWords": "QA Amount",
+        "modeOfPayment": "CHECK",
+        "explanation": "Payment for Invoice QA-INV-001",
+        "debitTotal": 2500,
+        "creditTotal": 2500,
+        "status": "DISBURSED",
+        "preparedBy": "Dev Administrator",
+        "entries": [],
+        "createdAt": "2026-05-18T14:10:58.286Z",
+        "updatedAt": "2026-05-18T14:10:58.318Z",
+        "approvedBy": "Dev Administrator",
+        "approvedAt": "2026-05-18T14:10:58.315Z"
+      },
+      "dvNumber": "DV-2026-00001",
+      "paymentDate": "2026-05-18T14:10:58.338Z",
+      "amount": 2500,
+      "paymentMode": "CHECK",
+      "checkNo": "QA-CHECK-001",
+      "referenceNo": "QA-REF-001",
+      "recipientName": "Fresh Farms Produce Ltd.",
+      "releasedBy": "Dev Administrator",
+      "acknowledgedReceipt": "QA-AR-001",
+      "status": "CLOSED",
+      "cashier": "Dev Administrator",
+      "createdAt": "2026-05-18T14:10:58.338Z",
+      "updatedAt": "2026-05-18T14:10:58.362Z",
+      "supplierORNo": "QA-OR-001",
+      "supplierORDate": "2026-05-18T22:10:58.3523397+08:00",
+      "isORValid": true,
+      "archivedAt": "2026-05-18T14:10:58.357Z"
+    }
+  ],
+  "ledger": [
+    {
+      "id": "led-g4ckfyxy",
+      "supplierId": "sup-001",
+      "supplier": {
+        "id": "sup-001",
+        "vendorCode": "SUP-001",
+        "name": "Fresh Farms Produce Ltd.",
+        "address": "Benguet, Philippines",
+        "contactPerson": "Maria Clara",
+        "contactDetails": "0917-123-4567",
+        "email": "sales@freshfarms.com",
+        "tin": "001-234-567-000",
+        "paymentTerms": "NET_45",
+        "creditLimit": 150000,
+        "status": "ACTIVE",
+        "isAccredited": true,
+        "accreditedDate": "2026-05-18T14:10:28.246Z",
+        "createdAt": "2026-05-18T14:10:28.246Z",
+        "updatedAt": "2026-05-18T14:10:57.765Z",
+        "items": [
+          {
+            "id": "itm-001",
+            "itemCode": "ITM-FF-001",
+            "description": "Premium Fuji Apples (Box)",
+            "category": "PRODUCE",
+            "unit": "BOX",
+            "standardCost": 1250,
+            "reorderPoint": 50,
+            "reorderQty": 200,
+            "stockStatus": "LOW_STOCK",
+            "supplierId": "sup-001",
+            "supplierName": "Fresh Farms Produce Ltd.",
+            "qtyOnHand": 50,
+            "qtyOnOrder": 0,
+            "inventoryStockStatus": [
+              {
+                "qtyOnHand": 50,
+                "qtyOnOrder": 0
+              }
+            ]
+          }
+        ]
+      },
+      "paymentId": "pay-36gpc8ob",
+      "payment": {
+        "id": "pay-36gpc8ob",
+        "voucherId": "vch-rggsxqx6",
+        "voucher": {
+          "id": "vch-rggsxqx6",
+          "voucherNo": "CV-2026-00002",
+          "voucherType": "CHECK",
+          "invoiceId": "inv-deiwa1it",
+          "invoice": {
+            "id": "inv-deiwa1it",
+            "grossAmount": 2500,
+            "items": [],
+            "vatAmount": 0,
+            "totalAmountDue": 2500,
+            "invoiceNo": "QA-INV-001",
+            "netAmount": 2500,
+            "poNumber": "PO-2026-00002",
+            "rrNumber": "RR-2026-00002",
+            "dueDate": "2026-05-25T22:10:58.2425220+08:00",
+            "invoiceDate": "2026-05-18T22:10:58.2289525+08:00",
+            "supplierId": "sup-001",
+            "supplier": {
+              "id": "sup-001",
+              "vendorCode": "SUP-001",
+              "name": "Fresh Farms Produce Ltd.",
+              "address": "Benguet, Philippines",
+              "contactPerson": "Maria Clara",
+              "contactDetails": "0917-123-4567",
+              "email": "sales@freshfarms.com",
+              "tin": "001-234-567-000",
+              "paymentTerms": "NET_45",
+              "creditLimit": 150000,
+              "status": "ACTIVE",
+              "isAccredited": true,
+              "accreditedDate": "2026-05-18T14:10:28.246Z",
+              "createdAt": "2026-05-18T14:10:28.246Z",
+              "updatedAt": "2026-05-18T14:10:57.765Z",
+              "items": [
+                {
+                  "id": "itm-001",
+                  "itemCode": "ITM-FF-001",
+                  "description": "Premium Fuji Apples (Box)",
+                  "category": "PRODUCE",
+                  "unit": "BOX",
+                  "standardCost": 1250,
+                  "reorderPoint": 50,
+                  "reorderQty": 200,
+                  "stockStatus": "LOW_STOCK",
+                  "supplierId": "sup-001",
+                  "supplierName": "Fresh Farms Produce Ltd.",
+                  "qtyOnHand": 50,
+                  "qtyOnOrder": 0,
+                  "inventoryStockStatus": [
+                    {
+                      "qtyOnHand": 50,
+                      "qtyOnOrder": 0
+                    }
+                  ]
+                }
+              ]
+            },
+            "poId": "po-3yywz55u",
+            "po": {
+              "id": "po-3yywz55u",
+              "poNumber": "PO-2026-00002",
+              "supplierId": "sup-001",
+              "supplier": {
+                "id": "sup-001",
+                "vendorCode": "SUP-001",
+                "name": "Fresh Farms Produce Ltd.",
+                "address": "Benguet, Philippines",
+                "contactPerson": "Maria Clara",
+                "contactDetails": "0917-123-4567",
+                "email": "sales@freshfarms.com",
+                "tin": "001-234-567-000",
+                "paymentTerms": "NET_45",
+                "creditLimit": 150000,
+                "status": "ACTIVE",
+                "isAccredited": true,
+                "accreditedDate": "2026-05-18T14:10:28.246Z",
+                "createdAt": "2026-05-18T14:10:28.246Z",
+                "updatedAt": "2026-05-18T14:10:57.765Z",
+                "items": [
+                  {
+                    "id": "itm-001",
+                    "itemCode": "ITM-FF-001",
+                    "description": "Premium Fuji Apples (Box)",
+                    "category": "PRODUCE",
+                    "unit": "BOX",
+                    "standardCost": 1250,
+                    "reorderPoint": 50,
+                    "reorderQty": 200,
+                    "stockStatus": "LOW_STOCK",
+                    "supplierId": "sup-001",
+                    "supplierName": "Fresh Farms Produce Ltd.",
+                    "qtyOnHand": 50,
+                    "qtyOnOrder": 0,
+                    "inventoryStockStatus": [
+                      {
+                        "qtyOnHand": 50,
+                        "qtyOnOrder": 0
+                      }
+                    ]
+                  }
+                ]
+              },
+              "prId": "pr-quqq6fy5",
+              "pr": {
+                "id": "pr-quqq6fy5",
+                "contactNo": "000",
+                "items": [
+                  {
+                    "unitCost": 1250,
+                    "itemCode": "ITM-FF-001",
+                    "description": "Premium Fuji Apples (Box)",
+                    "quantity": 2,
+                    "unit": "BOX"
+                  }
+                ],
+                "address": "Watermark",
+                "dateNeeded": "2026-05-21T22:10:57.7979602+08:00",
+                "purposeOfRequest": "QA E2E restock",
+                "requestedBy": "QA User",
+                "vendorCode": "SUP-001",
+                "suggestedSupplier": "Fresh Farms Produce Ltd.",
+                "requestingDept": "QA",
+                "prNumber": "PR-2026-00002",
+                "totalCost": 2500,
+                "status": "APPROVED",
+                "approvalLevel": "STORE_MANAGER",
+                "encodedBy": "Dev Administrator",
+                "createdAt": "2026-05-18T14:10:57.978Z",
+                "updatedAt": "2026-05-18T14:10:57.997Z",
+                "approvedBy": "Dev Administrator",
+                "approvedAt": "2026-05-18T14:10:57.995Z"
+              },
+              "date": "2026-05-18T14:10:58.010Z",
+              "forDepartment": "QA",
+              "requisitioner": "QA User",
+              "subtotal": 2500,
+              "taxVat": 0,
+              "total": 2500,
+              "status": "RECEIVED",
+              "preparedBy": "Dev Administrator",
+              "items": [
+                {
+                  "itemNo": "ITM-FF-001",
+                  "description": "Premium Fuji Apples (Box)",
+                  "quantity": 2,
+                  "unitPrice": 1250
+                }
+              ],
+              "createdAt": "2026-05-18T14:10:58.010Z",
+              "updatedAt": "2026-05-18T14:10:58.010Z"
+            },
+            "rrId": "rr-j6o77i92",
+            "rr": {
+              "id": "rr-j6o77i92",
+              "rrNumber": "RR-2026-00002",
+              "poId": "po-3yywz55u",
+              "po": {
+                "id": "po-3yywz55u",
+                "poNumber": "PO-2026-00002",
+                "supplierId": "sup-001",
+                "supplier": {
+                  "id": "sup-001",
+                  "vendorCode": "SUP-001",
+                  "name": "Fresh Farms Produce Ltd.",
+                  "address": "Benguet, Philippines",
+                  "contactPerson": "Maria Clara",
+                  "contactDetails": "0917-123-4567",
+                  "email": "sales@freshfarms.com",
+                  "tin": "001-234-567-000",
+                  "paymentTerms": "NET_45",
+                  "creditLimit": 150000,
+                  "status": "ACTIVE",
+                  "isAccredited": true,
+                  "accreditedDate": "2026-05-18T14:10:28.246Z",
+                  "createdAt": "2026-05-18T14:10:28.246Z",
+                  "updatedAt": "2026-05-18T14:10:57.765Z",
+                  "items": [
+                    {
+                      "id": "itm-001",
+                      "itemCode": "ITM-FF-001",
+                      "description": "Premium Fuji Apples (Box)",
+                      "category": "PRODUCE",
+                      "unit": "BOX",
+                      "standardCost": 1250,
+                      "reorderPoint": 50,
+                      "reorderQty": 200,
+                      "stockStatus": "LOW_STOCK",
+                      "supplierId": "sup-001",
+                      "supplierName": "Fresh Farms Produce Ltd.",
+                      "qtyOnHand": 50,
+                      "qtyOnOrder": 0,
+                      "inventoryStockStatus": [
+                        {
+                          "qtyOnHand": 50,
+                          "qtyOnOrder": 0
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "prId": "pr-quqq6fy5",
+                "pr": {
+                  "id": "pr-quqq6fy5",
+                  "contactNo": "000",
+                  "items": [
+                    {
+                      "unitCost": 1250,
+                      "itemCode": "ITM-FF-001",
+                      "description": "Premium Fuji Apples (Box)",
+                      "quantity": 2,
+                      "unit": "BOX"
+                    }
+                  ],
+                  "address": "Watermark",
+                  "dateNeeded": "2026-05-21T22:10:57.7979602+08:00",
+                  "purposeOfRequest": "QA E2E restock",
+                  "requestedBy": "QA User",
+                  "vendorCode": "SUP-001",
+                  "suggestedSupplier": "Fresh Farms Produce Ltd.",
+                  "requestingDept": "QA",
+                  "prNumber": "PR-2026-00002",
+                  "totalCost": 2500,
+                  "status": "APPROVED",
+                  "approvalLevel": "STORE_MANAGER",
+                  "encodedBy": "Dev Administrator",
+                  "createdAt": "2026-05-18T14:10:57.978Z",
+                  "updatedAt": "2026-05-18T14:10:57.997Z",
+                  "approvedBy": "Dev Administrator",
+                  "approvedAt": "2026-05-18T14:10:57.995Z"
+                },
+                "date": "2026-05-18T14:10:58.010Z",
+                "forDepartment": "QA",
+                "requisitioner": "QA User",
+                "subtotal": 2500,
+                "taxVat": 0,
+                "total": 2500,
+                "status": "RECEIVED",
+                "preparedBy": "Dev Administrator",
+                "items": [
+                  {
+                    "itemNo": "ITM-FF-001",
+                    "description": "Premium Fuji Apples (Box)",
+                    "quantity": 2,
+                    "unitPrice": 1250
+                  }
+                ],
+                "createdAt": "2026-05-18T14:10:58.010Z",
+                "updatedAt": "2026-05-18T14:10:58.010Z"
+              },
+              "receivedFrom": "Fresh Farms Produce Ltd.",
+              "via": "QA Delivery",
+              "supplierId": "sup-001",
+              "poDate": "2026-05-18T14:10:58.010Z",
+              "invoiceNo": "QA-INV-001",
+              "prNumber": "PR-2026-00002",
+              "status": "VERIFIED",
+              "receivingPersonnel": "Dev Administrator",
+              "items": [
+                {
+                  "unitPrice": 1250,
+                  "quantity": 2,
+                  "description": "Premium Fuji Apples (Box)",
+                  "total": null,
+                  "itemNo": "ITM-FF-001"
+                }
+              ],
+              "dateReceived": "2026-05-18T14:10:58.182Z",
+              "createdAt": "2026-05-18T14:10:58.182Z",
+              "updatedAt": "2026-05-18T14:10:58.182Z"
+            },
+            "threeWayStatus": "MATCHED",
+            "status": "PAID",
+            "createdAt": "2026-05-18T14:10:58.266Z",
+            "updatedAt": "2026-05-18T14:10:58.267Z"
+          },
+          "payee": "Fresh Farms Produce Ltd.",
+          "payeeAddress": "Benguet, Philippines",
+          "amountFigures": 2500,
+          "amountWords": "QA Amount",
+          "modeOfPayment": "CHECK",
+          "explanation": "Payment for Invoice QA-INV-001",
+          "debitTotal": 2500,
+          "creditTotal": 2500,
+          "status": "DISBURSED",
+          "preparedBy": "Dev Administrator",
+          "entries": [],
+          "createdAt": "2026-05-18T14:10:58.286Z",
+          "updatedAt": "2026-05-18T14:10:58.318Z",
+          "approvedBy": "Dev Administrator",
+          "approvedAt": "2026-05-18T14:10:58.315Z"
+        },
+        "dvNumber": "DV-2026-00001",
+        "paymentDate": "2026-05-18T14:10:58.338Z",
+        "amount": 2500,
+        "paymentMode": "CHECK",
+        "checkNo": "QA-CHECK-001",
+        "referenceNo": "QA-REF-001",
+        "recipientName": "Fresh Farms Produce Ltd.",
+        "releasedBy": "Dev Administrator",
+        "acknowledgedReceipt": "QA-AR-001",
+        "status": "PENDING_OR",
+        "cashier": "Dev Administrator",
+        "createdAt": "2026-05-18T14:10:58.338Z",
+        "updatedAt": "2026-05-18T14:10:58.338Z"
+      },
+      "description": "Payment for Voucher CV-2026-00002",
+      "debit": 2500,
+      "credit": 0,
+      "balance": 15000,
+      "createdAt": "2026-05-18T14:10:58.338Z"
+    },
+    {
+      "id": "led-sgwrrhd6",
+      "supplierId": "sup-001",
+      "supplier": {
+        "id": "sup-001",
+        "vendorCode": "SUP-001",
+        "name": "Fresh Farms Produce Ltd.",
+        "address": "Benguet, Philippines",
+        "contactPerson": "Maria Clara",
+        "contactDetails": "0917-123-4567",
+        "email": "sales@freshfarms.com",
+        "tin": "001-234-567-000",
+        "paymentTerms": "NET_45",
+        "creditLimit": 150000,
+        "status": "ACTIVE",
+        "isAccredited": true,
+        "accreditedDate": "2026-05-18T14:10:28.246Z",
+        "createdAt": "2026-05-18T14:10:28.246Z",
+        "updatedAt": "2026-05-18T14:10:57.765Z",
+        "items": [
+          {
+            "id": "itm-001",
+            "itemCode": "ITM-FF-001",
+            "description": "Premium Fuji Apples (Box)",
+            "category": "PRODUCE",
+            "unit": "BOX",
+            "standardCost": 1250,
+            "reorderPoint": 50,
+            "reorderQty": 200,
+            "stockStatus": "LOW_STOCK",
+            "supplierId": "sup-001",
+            "supplierName": "Fresh Farms Produce Ltd.",
+            "qtyOnHand": 50,
+            "qtyOnOrder": 0,
+            "inventoryStockStatus": [
+              {
+                "qtyOnHand": 50,
+                "qtyOnOrder": 0
+              }
+            ]
+          }
+        ]
+      },
+      "invoiceId": "inv-deiwa1it",
+      "invoice": {
+        "id": "inv-deiwa1it",
+        "grossAmount": 2500,
+        "items": [],
+        "vatAmount": 0,
+        "totalAmountDue": 2500,
+        "invoiceNo": "QA-INV-001",
+        "netAmount": 2500,
+        "poNumber": "PO-2026-00002",
+        "rrNumber": "RR-2026-00002",
+        "dueDate": "2026-05-25T22:10:58.2425220+08:00",
+        "invoiceDate": "2026-05-18T22:10:58.2289525+08:00",
+        "supplierId": "sup-001",
+        "supplier": {
+          "id": "sup-001",
+          "vendorCode": "SUP-001",
+          "name": "Fresh Farms Produce Ltd.",
+          "address": "Benguet, Philippines",
+          "contactPerson": "Maria Clara",
+          "contactDetails": "0917-123-4567",
+          "email": "sales@freshfarms.com",
+          "tin": "001-234-567-000",
+          "paymentTerms": "NET_45",
+          "creditLimit": 150000,
+          "status": "ACTIVE",
+          "isAccredited": true,
+          "accreditedDate": "2026-05-18T14:10:28.246Z",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:57.765Z",
+          "items": [
+            {
+              "id": "itm-001",
+              "itemCode": "ITM-FF-001",
+              "description": "Premium Fuji Apples (Box)",
+              "category": "PRODUCE",
+              "unit": "BOX",
+              "standardCost": 1250,
+              "reorderPoint": 50,
+              "reorderQty": 200,
+              "stockStatus": "LOW_STOCK",
+              "supplierId": "sup-001",
+              "supplierName": "Fresh Farms Produce Ltd.",
+              "qtyOnHand": 50,
+              "qtyOnOrder": 0,
+              "inventoryStockStatus": [
+                {
+                  "qtyOnHand": 50,
+                  "qtyOnOrder": 0
+                }
+              ]
+            }
+          ]
+        },
+        "poId": "po-3yywz55u",
+        "po": {
+          "id": "po-3yywz55u",
+          "poNumber": "PO-2026-00002",
+          "supplierId": "sup-001",
+          "supplier": {
+            "id": "sup-001",
+            "vendorCode": "SUP-001",
+            "name": "Fresh Farms Produce Ltd.",
+            "address": "Benguet, Philippines",
+            "contactPerson": "Maria Clara",
+            "contactDetails": "0917-123-4567",
+            "email": "sales@freshfarms.com",
+            "tin": "001-234-567-000",
+            "paymentTerms": "NET_45",
+            "creditLimit": 150000,
+            "status": "ACTIVE",
+            "isAccredited": true,
+            "accreditedDate": "2026-05-18T14:10:28.246Z",
+            "createdAt": "2026-05-18T14:10:28.246Z",
+            "updatedAt": "2026-05-18T14:10:57.765Z",
+            "items": [
+              {
+                "id": "itm-001",
+                "itemCode": "ITM-FF-001",
+                "description": "Premium Fuji Apples (Box)",
+                "category": "PRODUCE",
+                "unit": "BOX",
+                "standardCost": 1250,
+                "reorderPoint": 50,
+                "reorderQty": 200,
+                "stockStatus": "LOW_STOCK",
+                "supplierId": "sup-001",
+                "supplierName": "Fresh Farms Produce Ltd.",
+                "qtyOnHand": 50,
+                "qtyOnOrder": 0,
+                "inventoryStockStatus": [
+                  {
+                    "qtyOnHand": 50,
+                    "qtyOnOrder": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "prId": "pr-quqq6fy5",
+          "pr": {
+            "id": "pr-quqq6fy5",
+            "contactNo": "000",
+            "items": [
+              {
+                "unitCost": 1250,
+                "itemCode": "ITM-FF-001",
+                "description": "Premium Fuji Apples (Box)",
+                "quantity": 2,
+                "unit": "BOX"
+              }
+            ],
+            "address": "Watermark",
+            "dateNeeded": "2026-05-21T22:10:57.7979602+08:00",
+            "purposeOfRequest": "QA E2E restock",
+            "requestedBy": "QA User",
+            "vendorCode": "SUP-001",
+            "suggestedSupplier": "Fresh Farms Produce Ltd.",
+            "requestingDept": "QA",
+            "prNumber": "PR-2026-00002",
+            "totalCost": 2500,
+            "status": "APPROVED",
+            "approvalLevel": "STORE_MANAGER",
+            "encodedBy": "Dev Administrator",
+            "createdAt": "2026-05-18T14:10:57.978Z",
+            "updatedAt": "2026-05-18T14:10:57.997Z",
+            "approvedBy": "Dev Administrator",
+            "approvedAt": "2026-05-18T14:10:57.995Z"
+          },
+          "date": "2026-05-18T14:10:58.010Z",
+          "forDepartment": "QA",
+          "requisitioner": "QA User",
+          "subtotal": 2500,
+          "taxVat": 0,
+          "total": 2500,
+          "status": "RECEIVED",
+          "preparedBy": "Dev Administrator",
+          "items": [
+            {
+              "itemNo": "ITM-FF-001",
+              "description": "Premium Fuji Apples (Box)",
+              "quantity": 2,
+              "unitPrice": 1250
+            }
+          ],
+          "createdAt": "2026-05-18T14:10:58.010Z",
+          "updatedAt": "2026-05-18T14:10:58.010Z"
+        },
+        "rrId": "rr-j6o77i92",
+        "rr": {
+          "id": "rr-j6o77i92",
+          "rrNumber": "RR-2026-00002",
+          "poId": "po-3yywz55u",
+          "po": {
+            "id": "po-3yywz55u",
+            "poNumber": "PO-2026-00002",
+            "supplierId": "sup-001",
+            "supplier": {
+              "id": "sup-001",
+              "vendorCode": "SUP-001",
+              "name": "Fresh Farms Produce Ltd.",
+              "address": "Benguet, Philippines",
+              "contactPerson": "Maria Clara",
+              "contactDetails": "0917-123-4567",
+              "email": "sales@freshfarms.com",
+              "tin": "001-234-567-000",
+              "paymentTerms": "NET_45",
+              "creditLimit": 150000,
+              "status": "ACTIVE",
+              "isAccredited": true,
+              "accreditedDate": "2026-05-18T14:10:28.246Z",
+              "createdAt": "2026-05-18T14:10:28.246Z",
+              "updatedAt": "2026-05-18T14:10:57.765Z",
+              "items": [
+                {
+                  "id": "itm-001",
+                  "itemCode": "ITM-FF-001",
+                  "description": "Premium Fuji Apples (Box)",
+                  "category": "PRODUCE",
+                  "unit": "BOX",
+                  "standardCost": 1250,
+                  "reorderPoint": 50,
+                  "reorderQty": 200,
+                  "stockStatus": "LOW_STOCK",
+                  "supplierId": "sup-001",
+                  "supplierName": "Fresh Farms Produce Ltd.",
+                  "qtyOnHand": 50,
+                  "qtyOnOrder": 0,
+                  "inventoryStockStatus": [
+                    {
+                      "qtyOnHand": 50,
+                      "qtyOnOrder": 0
+                    }
+                  ]
+                }
+              ]
+            },
+            "prId": "pr-quqq6fy5",
+            "pr": {
+              "id": "pr-quqq6fy5",
+              "contactNo": "000",
+              "items": [
+                {
+                  "unitCost": 1250,
+                  "itemCode": "ITM-FF-001",
+                  "description": "Premium Fuji Apples (Box)",
+                  "quantity": 2,
+                  "unit": "BOX"
+                }
+              ],
+              "address": "Watermark",
+              "dateNeeded": "2026-05-21T22:10:57.7979602+08:00",
+              "purposeOfRequest": "QA E2E restock",
+              "requestedBy": "QA User",
+              "vendorCode": "SUP-001",
+              "suggestedSupplier": "Fresh Farms Produce Ltd.",
+              "requestingDept": "QA",
+              "prNumber": "PR-2026-00002",
+              "totalCost": 2500,
+              "status": "APPROVED",
+              "approvalLevel": "STORE_MANAGER",
+              "encodedBy": "Dev Administrator",
+              "createdAt": "2026-05-18T14:10:57.978Z",
+              "updatedAt": "2026-05-18T14:10:57.997Z",
+              "approvedBy": "Dev Administrator",
+              "approvedAt": "2026-05-18T14:10:57.995Z"
+            },
+            "date": "2026-05-18T14:10:58.010Z",
+            "forDepartment": "QA",
+            "requisitioner": "QA User",
+            "subtotal": 2500,
+            "taxVat": 0,
+            "total": 2500,
+            "status": "RECEIVED",
+            "preparedBy": "Dev Administrator",
+            "items": [
+              {
+                "itemNo": "ITM-FF-001",
+                "description": "Premium Fuji Apples (Box)",
+                "quantity": 2,
+                "unitPrice": 1250
+              }
+            ],
+            "createdAt": "2026-05-18T14:10:58.010Z",
+            "updatedAt": "2026-05-18T14:10:58.010Z"
+          },
+          "receivedFrom": "Fresh Farms Produce Ltd.",
+          "via": "QA Delivery",
+          "supplierId": "sup-001",
+          "poDate": "2026-05-18T14:10:58.010Z",
+          "invoiceNo": "QA-INV-001",
+          "prNumber": "PR-2026-00002",
+          "status": "VERIFIED",
+          "receivingPersonnel": "Dev Administrator",
+          "items": [
+            {
+              "unitPrice": 1250,
+              "quantity": 2,
+              "description": "Premium Fuji Apples (Box)",
+              "total": null,
+              "itemNo": "ITM-FF-001"
+            }
+          ],
+          "dateReceived": "2026-05-18T14:10:58.182Z",
+          "createdAt": "2026-05-18T14:10:58.182Z",
+          "updatedAt": "2026-05-18T14:10:58.182Z"
+        },
+        "threeWayStatus": "MATCHED",
+        "status": "OPEN",
+        "createdAt": "2026-05-18T14:10:58.266Z",
+        "updatedAt": "2026-05-18T14:10:58.267Z"
+      },
+      "description": "Invoice QA-INV-001",
+      "debit": 0,
+      "credit": 2500,
+      "balance": 17500,
+      "createdAt": "2026-05-18T14:10:58.267Z"
+    },
+    {
+      "id": "led-001",
+      "supplierId": "sup-002",
+      "supplier": {
+        "id": "sup-002",
+        "vendorCode": "SUP-002",
+        "name": "Unilever Philippines",
+        "address": "BGC, Taguig",
+        "contactPerson": "Juan Dela Cruz",
+        "contactDetails": "02-8888-1234",
+        "email": "distributor@unilever.ph",
+        "tin": "002-987-654-000",
+        "paymentTerms": "NET_60",
+        "creditLimit": 250000,
+        "status": "ACTIVE",
+        "isAccredited": true,
+        "accreditedDate": "2026-05-18T14:10:28.246Z",
+        "createdAt": "2026-05-18T14:10:28.246Z",
+        "updatedAt": "2026-05-18T14:10:28.246Z"
+      },
+      "invoiceId": "inv-001",
+      "invoice": {
+        "id": "inv-001",
+        "invoiceNo": "INV-UL-0001",
+        "supplierId": "sup-002",
+        "supplier": {
+          "id": "sup-002",
+          "vendorCode": "SUP-002",
+          "name": "Unilever Philippines",
+          "address": "BGC, Taguig",
+          "contactPerson": "Juan Dela Cruz",
+          "contactDetails": "02-8888-1234",
+          "email": "distributor@unilever.ph",
+          "tin": "002-987-654-000",
+          "paymentTerms": "NET_60",
+          "creditLimit": 250000,
+          "status": "ACTIVE",
+          "isAccredited": true,
+          "accreditedDate": "2026-05-18T14:10:28.246Z",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:28.246Z"
+        },
+        "poId": "po-001",
+        "po": {
+          "id": "po-001",
+          "poNumber": "PO-2026-00001",
+          "supplierId": "sup-002",
+          "supplier": {
+            "id": "sup-002",
+            "vendorCode": "SUP-002",
+            "name": "Unilever Philippines",
+            "address": "BGC, Taguig",
+            "contactPerson": "Juan Dela Cruz",
+            "contactDetails": "02-8888-1234",
+            "email": "distributor@unilever.ph",
+            "tin": "002-987-654-000",
+            "paymentTerms": "NET_60",
+            "creditLimit": 250000,
+            "status": "ACTIVE",
+            "isAccredited": true,
+            "accreditedDate": "2026-05-18T14:10:28.246Z",
+            "createdAt": "2026-05-18T14:10:28.246Z",
+            "updatedAt": "2026-05-18T14:10:28.246Z"
+          },
+          "prId": "pr-001",
+          "pr": {
+            "id": "pr-001",
+            "prNumber": "PR-2026-00001",
+            "requestedBy": "Dev Administrator",
+            "requestingDept": "GROCERY",
+            "purposeOfRequest": "Restocking fast-moving personal care items",
+            "address": "Watermark Supermarket",
+            "contactNo": "123-4567",
+            "datePrepared": "2026-05-18T14:10:28.246Z",
+            "dateNeeded": "2026-05-18T14:10:28.246Z",
+            "suggestedSupplier": "Unilever Philippines",
+            "vendorCode": "SUP-002",
+            "totalCost": 15000,
+            "status": "APPROVED",
+            "approvalLevel": "STORE_MANAGER",
+            "encodedBy": "dev-admin-id",
+            "createdAt": "2026-05-18T14:10:28.246Z",
+            "updatedAt": "2026-05-18T14:10:28.246Z",
+            "items": [
+              {
+                "id": "pri-001",
+                "itemCode": "ITM-UL-001",
+                "description": "Dove Soap Original 135g (Pack of 3)",
+                "quantity": 100,
+                "unit": "PACK",
+                "unitCost": 150,
+                "totalCost": 15000
+              }
+            ]
+          },
+          "date": "2026-05-18T14:10:28.246Z",
+          "forDepartment": "GROCERY",
+          "requisitioner": "Dev Administrator",
+          "subtotal": 15000,
+          "taxVat": 0,
+          "total": 15000,
+          "status": "OPEN",
+          "preparedBy": "Dev Administrator",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:28.246Z",
+          "items": [
+            {
+              "id": "poi-001",
+              "itemNo": "ITM-UL-001",
+              "description": "Dove Soap Original 135g (Pack of 3)",
+              "quantity": 100,
+              "unitPrice": 150,
+              "amount": 15000
+            }
+          ]
+        },
+        "rrId": "rr-001",
+        "rr": {
+          "id": "rr-001",
+          "rrNumber": "RR-2026-00001",
+          "poId": "po-001",
+          "po": {
+            "id": "po-001",
+            "poNumber": "PO-2026-00001",
+            "supplierId": "sup-002",
+            "supplier": {
+              "id": "sup-002",
+              "vendorCode": "SUP-002",
+              "name": "Unilever Philippines",
+              "address": "BGC, Taguig",
+              "contactPerson": "Juan Dela Cruz",
+              "contactDetails": "02-8888-1234",
+              "email": "distributor@unilever.ph",
+              "tin": "002-987-654-000",
+              "paymentTerms": "NET_60",
+              "creditLimit": 250000,
+              "status": "ACTIVE",
+              "isAccredited": true,
+              "accreditedDate": "2026-05-18T14:10:28.246Z",
+              "createdAt": "2026-05-18T14:10:28.246Z",
+              "updatedAt": "2026-05-18T14:10:28.246Z"
+            },
+            "prId": "pr-001",
+            "pr": {
+              "id": "pr-001",
+              "prNumber": "PR-2026-00001",
+              "requestedBy": "Dev Administrator",
+              "requestingDept": "GROCERY",
+              "purposeOfRequest": "Restocking fast-moving personal care items",
+              "address": "Watermark Supermarket",
+              "contactNo": "123-4567",
+              "datePrepared": "2026-05-18T14:10:28.246Z",
+              "dateNeeded": "2026-05-18T14:10:28.246Z",
+              "suggestedSupplier": "Unilever Philippines",
+              "vendorCode": "SUP-002",
+              "totalCost": 15000,
+              "status": "APPROVED",
+              "approvalLevel": "STORE_MANAGER",
+              "encodedBy": "dev-admin-id",
+              "createdAt": "2026-05-18T14:10:28.246Z",
+              "updatedAt": "2026-05-18T14:10:28.246Z",
+              "items": [
+                {
+                  "id": "pri-001",
+                  "itemCode": "ITM-UL-001",
+                  "description": "Dove Soap Original 135g (Pack of 3)",
+                  "quantity": 100,
+                  "unit": "PACK",
+                  "unitCost": 150,
+                  "totalCost": 15000
+                }
+              ]
+            },
+            "date": "2026-05-18T14:10:28.246Z",
+            "forDepartment": "GROCERY",
+            "requisitioner": "Dev Administrator",
+            "subtotal": 15000,
+            "taxVat": 0,
+            "total": 15000,
+            "status": "OPEN",
+            "preparedBy": "Dev Administrator",
+            "createdAt": "2026-05-18T14:10:28.246Z",
+            "updatedAt": "2026-05-18T14:10:28.246Z",
+            "items": [
+              {
+                "id": "poi-001",
+                "itemNo": "ITM-UL-001",
+                "description": "Dove Soap Original 135g (Pack of 3)",
+                "quantity": 100,
+                "unitPrice": 150,
+                "amount": 15000
+              }
+            ]
+          },
+          "receivedFrom": "Unilever Philippines",
+          "via": "Direct Delivery",
+          "supplierId": "sup-002",
+          "poDate": "2026-05-18T14:10:28.246Z",
+          "invoiceNo": "INV-UL-0001",
+          "dateReceived": "2026-05-18T14:10:28.246Z",
+          "prNumber": "PR-2026-00001",
+          "status": "VERIFIED",
+          "receivingPersonnel": "Dev Administrator",
+          "createdAt": "2026-05-18T14:10:28.246Z",
+          "updatedAt": "2026-05-18T14:10:28.246Z",
+          "items": [
+            {
+              "id": "rri-001",
+              "itemNo": "ITM-UL-001",
+              "description": "Dove Soap Original 135g (Pack of 3)",
+              "quantity": 100,
+              "unitPrice": 150,
+              "total": 15000
+            }
+          ]
+        },
+        "invoiceDate": "2026-05-18T14:10:28.246Z",
+        "dueDate": "2026-05-25T14:10:28.246Z",
+        "grossAmount": 15000,
+        "discount": 0,
+        "netAmount": 15000,
+        "vatAmount": 0,
+        "totalAmountDue": 15000,
+        "threeWayStatus": "MATCHED",
+        "status": "APPROVED",
+        "createdAt": "2026-05-18T14:10:28.246Z",
+        "updatedAt": "2026-05-18T14:10:28.246Z",
+        "items": [
+          {
+            "id": "invi-001",
+            "no": 1,
+            "description": "Dove Soap Original 135g (Pack of 3)",
+            "qty": 100,
+            "unit": "PACK",
+            "unitPrice": 150,
+            "amount": 15000
+          }
+        ]
+      },
+      "description": "Invoice INV-UL-0001",
+      "debit": 0,
+      "credit": 15000,
+      "balance": 15000,
+      "createdAt": "2026-05-18T14:10:28.246Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx-c2jtzqr1",
+      "itemId": "itm-001",
+      "transactionType": "ADD",
+      "quantity": 5,
+      "previousQty": 45,
+      "newQty": 50,
+      "variance": null,
+      "unitCost": 1250,
+      "remarks": "QA stock add",
+      "createdBy": "dev-admin-id",
+      "createdAt": "2026-05-18T14:10:57.753Z"
+    }
+  ]
+}

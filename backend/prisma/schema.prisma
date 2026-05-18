@@ -20,12 +20,18 @@ model User {
 }
 
 enum Role {
+  REQUESTER
   STORE_MANAGER
   FINANCE_BUDGETING
   CFO
+  PURCHASING
   PURCHASING_OFFICER
+  RECEIVING
   RECEIVING_CLERK
+  ACCOUNTING
   INVENTORY_CUSTODIAN
+  MANAGEMENT
+  DISBURSEMENT
   AP_CLERK
   TREASURER
   CASHIER
@@ -49,13 +55,17 @@ model Item {
   category      String
   unit          String
   standardCost  Decimal
-  reorderPoint  Int
+  reorderPoint  Float    @default(0)
   reorderQty    Int
   barcode       String?  @unique
+  stockStatus   String   @default("NORMAL")
+  supplier      Supplier? @relation(fields: [supplierId], references: [id])
+  supplierId    String?
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   inventoryStockStatus InventoryStock[]
+  transactions  InventoryTransaction[]
 }
 
 // Inventory Stock Status File
@@ -69,6 +79,21 @@ model InventoryStock {
   updatedBy     String
 }
 
+model InventoryTransaction {
+  id              String   @id @default(cuid())
+  itemId          String
+  item            Item     @relation(fields: [itemId], references: [id])
+  transactionType String
+  quantity        Float
+  previousQty     Float
+  newQty          Float
+  variance        Float?
+  unitCost        Float?
+  remarks         String?
+  createdBy       String
+  createdAt       DateTime @default(now())
+}
+
 // Approved Suppliers Master File
 model Supplier {
   id              String   @id @default(uuid())
@@ -80,6 +105,8 @@ model Supplier {
   email           String
   tin             String
   paymentTerms    String
+  creditLimit     Decimal  @default(0)
+  status          String   @default("ACTIVE")
   isAccredited    Boolean  @default(true)
   accreditedDate  DateTime
   createdAt       DateTime @default(now())
@@ -87,6 +114,7 @@ model Supplier {
   purchaseOrders  PurchaseOrder[]
   invoices        SupplierInvoice[]
   apLedgerEntries APLedgerEntry[]
+  items           Item[]
 }
 
 // Purchase Requisition
@@ -353,6 +381,7 @@ enum PaymentMode {
   CASH
   CHECK
   ONLINE_TRANSFER
+  BANK_TRANSFER
 }
 enum VoucherStatus {
   PENDING
@@ -376,14 +405,21 @@ model Payment {
   id                String   @id @default(uuid())
   voucher           VoucherPackage @relation(fields: [voucherId], references: [id])
   voucherId         String
+  dvNumber          String?  @unique
   paymentDate       DateTime @default(now())
   amount            Decimal
+  paymentMode       PaymentMode?
   checkNo           String?
   referenceNo       String?
   remittanceAdvice  String?
+  recipientName     String?
+  modeOfReceipt     String?
+  releasedBy        String?
+  acknowledgedReceipt String?
   supplierORNo      String?
   supplierORDate    DateTime?
   isORValid         Boolean?
+  archivedAt        DateTime?
   status            PaymentStatus @default(PENDING_OR)
   cashier           String
   apLedgerEntries   APLedgerEntry[]

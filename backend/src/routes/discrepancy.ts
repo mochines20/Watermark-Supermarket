@@ -1,6 +1,8 @@
 import express from 'express';
 import prisma from '../utils/prisma';
 import { authenticateToken } from '../middleware/auth';
+import { requireRole } from '../middleware/role';
+import { auditUser, logAudit } from '../utils/audit';
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -28,7 +30,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requireRole('RECEIVING', 'RECEIVING_CLERK', 'ADMIN'), async (req, res) => {
   try {
     const data = req.body;
     
@@ -68,6 +70,16 @@ router.post('/', async (req, res) => {
       return newDR;
     });
 
+    const user = auditUser(req);
+    await logAudit(prisma, {
+      ...user,
+      action: 'CREATE',
+      module: 'DISCREPANCY',
+      referenceId: dr.id,
+      referenceNo: dr.reportNo,
+      details: `Created discrepancy report ${dr.reportNo}`
+    });
+
     res.json(dr);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
@@ -77,7 +89,7 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const dr = await prisma.discrepancyReport.findUnique({
-      where: { id: req.params.id },
+      where: { id: String(req.params.id) },
       include: {
         rr: {
           include: {

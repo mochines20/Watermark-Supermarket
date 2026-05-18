@@ -4,28 +4,56 @@ import jwt from 'jsonwebtoken';
 export interface AuthRequest extends Request {
   user?: {
     id: string;
+    name?: string;
+    email?: string;
     role: string;
     department: string;
   };
 }
 
 export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
-  // --- TEMPORARY DEV BYPASS ---
-  // Injects a mock admin user to bypass JWT requirement since DB seed failed locally.
-  const mockUser = {
-    id: 'dev-admin-id',
-    name: 'Dev Administrator',
-    role: 'ADMIN',
-    department: 'MANAGEMENT'
-  };
+  if (process.env.DEV_BYPASS === 'true') {
+    const mockUser = {
+      id: 'dev-admin-id',
+      name: 'Dev Administrator',
+      email: 'dev@watermark.local',
+      role: 'ADMIN',
+      department: 'MANAGEMENT'
+    };
 
-  (req as any).__auditContext = {
-    userId: mockUser.id,
-    userName: mockUser.name
-  };
-  
-  req.user = mockUser;
-  next();
+    (req as any).__auditContext = {
+      userId: mockUser.id,
+      userName: mockUser.name
+    };
+    
+    req.user = mockUser;
+    return next();
+  }
+
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
+
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as any;
+    req.user = {
+      id: decoded.id,
+      name: decoded.name,
+      email: decoded.email,
+      role: decoded.role,
+      department: decoded.department
+    };
+    (req as any).__auditContext = {
+      userId: decoded.id,
+      userName: decoded.name || decoded.email || decoded.id
+    };
+    next();
+  } catch {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
 };
 
 export const requireRole = (roles: string[]) => {

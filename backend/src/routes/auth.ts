@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '../utils/prisma';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { requireRole } from '../middleware/role';
 
 const router = express.Router();
 
@@ -12,6 +13,25 @@ router.post('/login', async (req, res) => {
     
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    if (process.env.DEV_BYPASS === 'true') {
+      const devEmail = 'admin@watermark.com';
+      const devPassword = 'admin123';
+      if (email !== devEmail || password !== devPassword) {
+        return res.status(401).json({ error: 'Invalid dev credentials' });
+      }
+
+      const user = {
+        id: 'dev-admin-id',
+        name: 'Dev Administrator',
+        email: devEmail,
+        role: 'ADMIN',
+        department: 'ADMINISTRATION'
+      };
+      const token = jwt.sign(user, process.env.JWT_SECRET as string, { expiresIn: '15m' });
+      const refreshToken = jwt.sign({ id: user.id }, process.env.JWT_REFRESH_SECRET as string, { expiresIn: '7d' });
+      return res.json({ token, refreshToken, user });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
@@ -25,7 +45,7 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role, department: user.department, name: user.name },
+      { id: user.id, role: user.role, department: user.department, name: user.name, email: user.email },
       process.env.JWT_SECRET as string,
       { expiresIn: '15m' }
     );
@@ -60,7 +80,7 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res) => {
   }
 });
 
-router.get('/users', authenticateToken, async (req: AuthRequest, res) => {
+router.get('/users', authenticateToken, requireRole('ADMIN'), async (req: AuthRequest, res) => {
   try {
     const users = await prisma.user.findMany({
       select: { id: true, name: true, email: true, role: true, department: true, isActive: true, createdAt: true },
@@ -72,7 +92,7 @@ router.get('/users', authenticateToken, async (req: AuthRequest, res) => {
   }
 });
 
-router.post('/users', authenticateToken, async (req: AuthRequest, res) => {
+router.post('/users', authenticateToken, requireRole('ADMIN'), async (req: AuthRequest, res) => {
   try {
     const { name, email, password, role, department } = req.body;
     
@@ -101,7 +121,7 @@ router.post('/users', authenticateToken, async (req: AuthRequest, res) => {
   }
 });
 
-router.put('/users/:id', authenticateToken, async (req: AuthRequest, res) => {
+router.put('/users/:id', authenticateToken, requireRole('ADMIN'), async (req: AuthRequest, res) => {
   try {
     const id = req.params.id as string;
     const { name, role, department, isActive, password } = req.body;
@@ -124,7 +144,7 @@ router.put('/users/:id', authenticateToken, async (req: AuthRequest, res) => {
   }
 });
 
-router.delete('/users/:id', authenticateToken, async (req: AuthRequest, res) => {
+router.delete('/users/:id', authenticateToken, requireRole('ADMIN'), async (req: AuthRequest, res) => {
   try {
     const id = req.params.id as string;
     await prisma.user.delete({ where: { id } });

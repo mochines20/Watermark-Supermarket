@@ -29,14 +29,11 @@ const Sidebar = () => {
 
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
         <div>
+          <div className="px-3 mb-2 text-xs font-bold text-[#A1B6D0] uppercase tracking-wider">Procurement</div>
           <NavLink to="/" className={({isActive}) => `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive ? 'nav-active' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}>
             <LayoutDashboard className="w-5 h-5" />
             <span className="text-sm font-medium">Dashboard</span>
           </NavLink>
-        </div>
-
-        <div>
-          <div className="px-3 mb-2 text-xs font-bold text-[#A1B6D0] uppercase tracking-wider">Procurement</div>
           <NavLink to="/pr" className={({isActive}) => `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive ? 'nav-active' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}>
             <FileText className="w-5 h-5" />
             <span className="text-sm font-medium">Purchase Requisition</span>
@@ -47,11 +44,13 @@ const Sidebar = () => {
           </NavLink>
           
           <div className="mt-2">
-            <div className="flex items-center gap-3 px-3 py-2 text-gray-300">
+            <div className="px-3 mb-2 mt-4 text-xs font-bold text-[#A1B6D0] uppercase tracking-wider">Warehouse</div>
+            <NavLink to="/receiving" className={({isActive}) => `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive ? 'nav-active' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}>
               <Truck className="w-5 h-5" />
-              <span className="text-sm font-medium">Receiving</span>
-            </div>
+              <span className="text-sm font-medium">Receiving Dashboard</span>
+            </NavLink>
             <div className="pl-11 space-y-1">
+              <NavLink to="/receiving/deliveries" className={({isActive}) => `block py-1.5 text-sm transition-colors ${isActive ? 'text-[#4FD3EC] font-medium' : 'text-gray-400 hover:text-white'}`}>Pending Deliveries</NavLink>
               <NavLink to="/receiving/reports" className={({isActive}) => `block py-1.5 text-sm transition-colors ${isActive ? 'text-[#4FD3EC] font-medium' : 'text-gray-400 hover:text-white'}`}>Receiving Reports</NavLink>
               <NavLink to="/receiving/discrepancies" className={({isActive}) => `block py-1.5 text-sm transition-colors ${isActive ? 'text-[#4FD3EC] font-medium' : 'text-gray-400 hover:text-white'}`}>Discrepancy Reports</NavLink>
             </div>
@@ -63,6 +62,7 @@ const Sidebar = () => {
               <span className="text-sm font-medium">Inventory</span>
             </div>
             <div className="pl-11 space-y-1">
+              <NavLink to="/inventory" className={({isActive}) => `block py-1.5 text-sm transition-colors ${isActive ? 'text-[#4FD3EC] font-medium' : 'text-gray-400 hover:text-white'}`}>Item Master</NavLink>
               <NavLink to="/inventory/stock" className={({isActive}) => `block py-1.5 text-sm transition-colors ${isActive ? 'text-[#4FD3EC] font-medium' : 'text-gray-400 hover:text-white'}`}>Stock Status</NavLink>
               <NavLink to="/inventory/alerts" className={({isActive}) => `flex items-center justify-between py-1.5 text-sm transition-colors ${isActive ? 'text-[#4FD3EC] font-medium' : 'text-gray-400 hover:text-white'}`}>
                 <span>Reorder Alerts</span>
@@ -73,7 +73,11 @@ const Sidebar = () => {
         </div>
 
         <div>
-          <div className="px-3 mb-2 text-xs font-bold text-[#A1B6D0] uppercase tracking-wider">Finance</div>
+          <div className="px-3 mb-2 text-xs font-bold text-[#A1B6D0] uppercase tracking-wider">Finance/AP</div>
+          <NavLink to="/accounting" className={({isActive}) => `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive ? 'nav-active' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}>
+            <LayoutDashboard className="w-5 h-5" />
+            <span className="text-sm font-medium">Accounting Dashboard</span>
+          </NavLink>
           <div className="mt-2">
             <div className="flex items-center gap-3 px-3 py-2 text-gray-300">
               <Receipt className="w-5 h-5" />
@@ -103,7 +107,7 @@ const Sidebar = () => {
         </div>
         
         <div>
-          <div className="px-3 mb-2 text-xs font-bold text-[#A1B6D0] uppercase tracking-wider">Setup</div>
+          <div className="px-3 mb-2 text-xs font-bold text-[#A1B6D0] uppercase tracking-wider">Admin</div>
           <NavLink to="/suppliers" className={({isActive}) => `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive ? 'nav-active' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}>
             <Building2 className="w-5 h-5" />
             <span className="text-sm font-medium">Suppliers</span>

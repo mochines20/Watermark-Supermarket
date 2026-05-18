@@ -15,6 +15,7 @@ import apRoutes from './routes/ap';
 import vouchersRoutes from './routes/vouchers';
 import disbursementRoutes from './routes/disbursement';
 import discrepancyRoutes from './routes/discrepancy';
+import devFixtureRoutes from './routes/devFixtures';
 
 const app = express();
 const httpServer = createServer(app);
@@ -43,6 +44,10 @@ io.on('connection', (socket) => {
 
 // API Routes
 const apiRouter = express.Router();
+
+if (process.env.DEV_FIXTURES === 'true') {
+  apiRouter.use(devFixtureRoutes);
+}
 
 apiRouter.use('/auth', authRoutes);
 apiRouter.use('/pr', prRoutes);

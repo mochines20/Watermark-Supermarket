@@ -16,6 +16,10 @@ const Suppliers = () => {
   const [soaData, setSoaData] = useState<any | null>(null);
   const [queryOpen, setQueryOpen] = useState(false);
   const [queryData, setQueryData] = useState<any | null>(null);
+  const [editingSupplier, setEditingSupplier] = useState<any | null>(null);
+  const [linkedItems, setLinkedItems] = useState<any[]>([]);
+  const [allItems, setAllItems] = useState<any[]>([]);
+  const [itemSearch, setItemSearch] = useState('');
 
   // Form State
   const [formData, setFormData] = useState({
@@ -70,7 +74,31 @@ const Suppliers = () => {
     }
   };
 
-  const formatMoney = (value: any) => `₱${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formatMoney = (value: any) => `\u20B1${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  const openEdit = async (supplier: any) => {
+    setEditingSupplier(supplier);
+    setShowForm(false);
+    const [items, inventoryItems] = await Promise.all([
+      procurementApi.getSupplierItems(supplier.id),
+      procurementApi.getItems()
+    ]);
+    setLinkedItems(items);
+    setAllItems(inventoryItems);
+  };
+
+  const saveSupplierSection = async (updateType: string, data: any) => {
+    if (!editingSupplier) return;
+    const updated = await procurementApi.updateSupplier(editingSupplier.id, { updateType, ...data });
+    setEditingSupplier(updated);
+    fetchData();
+  };
+
+  const linkItem = async (itemId: string) => {
+    if (!editingSupplier) return;
+    await procurementApi.linkSupplierItems(editingSupplier.id, [itemId]);
+    setLinkedItems(await procurementApi.getSupplierItems(editingSupplier.id));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,6 +112,12 @@ const Suppliers = () => {
       });
     } catch (error: any) {
       console.error('Failed to submit:', error);
+      if (error.response?.status === 409) {
+        const existing = error.response.data?.supplier;
+        const shouldEdit = window.confirm('Vendor already exists. Do you want to update the existing record?');
+        if (shouldEdit && existing) openEdit(existing);
+        return;
+      }
       alert(error.response?.data?.error || 'Error creating supplier');
     }
   };
@@ -104,7 +138,41 @@ const Suppliers = () => {
         )}
       </div>
 
-      {showForm ? (
+      {editingSupplier ? (
+        <GlassCard className="animate-fade-in relative">
+          <button onClick={() => setEditingSupplier(null)} className="absolute top-4 right-4 text-white/50 hover:text-white"><X size={24} /></button>
+          <h2 className="text-xl font-semibold text-white mb-6 border-b border-white/10 pb-4">Edit Supplier - {editingSupplier.name}</h2>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <SupplierEditSection title="Contact Info" fields={{ name: editingSupplier.name, phone: editingSupplier.contactDetails, email: editingSupplier.email }} onSave={(data) => saveSupplierSection('CONTACT', data)} />
+            <SupplierEditSection title="Payment Terms" fields={{ paymentTerms: editingSupplier.paymentTerms, creditLimit: editingSupplier.creditLimit || 0 }} onSave={(data) => saveSupplierSection('PAYMENT_TERMS', data)} />
+            <SupplierEditSection title="Address" fields={{ address: editingSupplier.address }} onSave={(data) => saveSupplierSection('ADDRESS', data)} />
+            <SupplierEditSection title="Status" fields={{ status: editingSupplier.status || (editingSupplier.isAccredited ? 'ACTIVE' : 'INACTIVE') }} onSave={(data) => saveSupplierSection('STATUS', data)} />
+          </div>
+          <div className="mt-8 border-t border-white/10 pt-6">
+            <h3 className="text-lg font-bold text-white mb-4">Linked Items</h3>
+            <input value={itemSearch} onChange={(e) => setItemSearch(e.target.value)} placeholder="Search item by name/code" className="w-full max-w-md bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-white mb-4" />
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="text-sm font-semibold text-watermark-blue-200">Current Items</div>
+                {linkedItems.map((item) => <div key={item.id} className="p-3 rounded-lg bg-white/5 text-white">{item.itemCode} - {item.description}</div>)}
+                {linkedItems.length === 0 && <div className="text-sm text-white/50">No linked items yet.</div>}
+              </div>
+              <div className="space-y-2">
+                <div className="text-sm font-semibold text-watermark-blue-200">Search Results</div>
+                {allItems.filter((item) => {
+                  const term = itemSearch.toLowerCase();
+                  return term && (item.itemCode.toLowerCase().includes(term) || item.description.toLowerCase().includes(term));
+                }).slice(0, 6).map((item) => (
+                  <button key={item.id} onClick={() => linkItem(item.id)} className="block w-full text-left p-3 rounded-lg bg-white/5 hover:bg-white/10 text-white">{item.itemCode} - {item.description}</button>
+                ))}
+                {itemSearch && allItems.filter((item) => item.itemCode.toLowerCase().includes(itemSearch.toLowerCase()) || item.description.toLowerCase().includes(itemSearch.toLowerCase())).length === 0 && (
+                  <div className="text-sm text-white/50">No item found — vendor saved without item link</div>
+                )}
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+      ) : showForm ? (
         <GlassCard className="animate-fade-in relative">
           <button 
             onClick={() => setShowForm(false)}
@@ -168,6 +236,12 @@ const Suppliers = () => {
                     <td className="py-4 text-white/70">{sup.contactPerson}</td>
                     <td className="py-4"><StatusBadge status={sup.isAccredited ? 'APPROVED' : 'PENDING'} /></td>
                     <td className="py-4 text-right flex justify-end gap-2">
+                      <button 
+                        onClick={() => openEdit(sup)}
+                        className="text-sm text-watermark-blue-300 hover:text-white px-3 py-1 bg-white/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        Edit
+                      </button>
                       <button 
                         onClick={() => handlePrintQuery(sup.id)}
                         className="text-sm text-watermark-blue-300 hover:text-white px-3 py-1 bg-white/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
@@ -643,6 +717,38 @@ const Suppliers = () => {
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+const SupplierEditSection = ({ title, fields, onSave }: { title: string; fields: Record<string, any>; onSave: (data: any) => void }) => {
+  const [values, setValues] = useState(fields);
+
+  useEffect(() => {
+    setValues(fields);
+  }, [fields]);
+
+  return (
+    <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+      <h3 className="text-white font-bold mb-4">{title}</h3>
+      <div className="space-y-3">
+        {Object.entries(values).map(([key, value]) => (
+          <label key={key} className="block text-sm text-white/80">
+            {key.replace(/([A-Z])/g, ' $1').replace(/^./, (char) => char.toUpperCase())}
+            {key === 'status' ? (
+              <select value={String(value ?? '')} onChange={(e) => setValues({ ...values, [key]: e.target.value })} className="mt-2 w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-white">
+                <option className="text-black" value="ACTIVE">Active</option>
+                <option className="text-black" value="INACTIVE">Inactive</option>
+              </select>
+            ) : (
+              <input value={String(value ?? '')} onChange={(e) => setValues({ ...values, [key]: e.target.value })} className="mt-2 w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-white" />
+            )}
+          </label>
+        ))}
+      </div>
+      <div className="mt-4 flex justify-end">
+        <PrimaryButton onClick={() => onSave(values)}>Save {title}</PrimaryButton>
+      </div>
     </div>
   );
 };

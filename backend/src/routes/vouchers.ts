@@ -1,6 +1,8 @@
 import express from 'express';
 import prisma from '../utils/prisma';
 import { authenticateToken } from '../middleware/auth';
+import { requireRole } from '../middleware/role';
+import { auditUser, logAudit } from '../utils/audit';
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -28,7 +30,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requireRole('ACCOUNTING', 'AP_CLERK', 'ADMIN'), async (req, res) => {
   try {
     const data = req.body;
     
@@ -65,6 +67,16 @@ router.post('/', async (req, res) => {
       include: { entries: true }
     });
 
+    const user = auditUser(req);
+    await logAudit(prisma, {
+      ...user,
+      action: 'CREATE',
+      module: 'VOUCHER',
+      referenceId: voucher.id,
+      referenceNo: voucher.voucherNo,
+      details: `Created voucher ${voucher.voucherNo}`
+    });
+
     res.json(voucher);
   } catch (error) {
     console.error('Error creating voucher:', error);
@@ -72,10 +84,10 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.post('/:id/approve', async (req, res) => {
+router.post('/:id/approve', requireRole('MANAGEMENT', 'CFO', 'ADMIN'), async (req, res) => {
   try {
     const voucher = await prisma.voucherPackage.update({
-      where: { id: req.params.id },
+      where: { id: String(req.params.id) },
       data: {
         status: 'APPROVED',
         approvedBy: (req as any).user?.name || 'Admin',
@@ -89,6 +101,16 @@ router.post('/:id/approve', async (req, res) => {
       data: { status: 'APPROVED' }
     });
 
+    const user = auditUser(req);
+    await logAudit(prisma, {
+      ...user,
+      action: 'APPROVE',
+      module: 'VOUCHER',
+      referenceId: voucher.id,
+      referenceNo: voucher.voucherNo,
+      details: `Approved voucher ${voucher.voucherNo}`
+    });
+
     res.json(voucher);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
@@ -98,7 +120,7 @@ router.post('/:id/approve', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const voucher = await prisma.voucherPackage.findUnique({
-      where: { id: req.params.id },
+      where: { id: String(req.params.id) },
       include: { 
         invoice: {
           include: { po: true, rr: true }

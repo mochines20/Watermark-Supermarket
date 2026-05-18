@@ -1,6 +1,8 @@
 import express from 'express';
 import prisma from '../utils/prisma';
 import { authenticateToken } from '../middleware/auth';
+import { requireRole } from '../middleware/role';
+import { auditUser, logAudit } from '../utils/audit';
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -17,6 +19,78 @@ const generateRRNumber = async () => {
   return `RR-${year}-${sequence}`;
 };
 
+const generateDRNumber = async () => {
+  const year = new Date().getFullYear();
+  const counter = await prisma.counter.upsert({
+    where: { type: 'DR' },
+    update: { value: { increment: 1 } },
+    create: { type: 'DR', value: 1 }
+  });
+  const sequence = String(counter.value).padStart(5, '0');
+  return `DR-${year}-${sequence}`;
+};
+
+router.get('/dashboard', async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const [pendingDeliveries, todaysReceipts, openDiscrepancies, recentReceipts, stockAlerts] = await Promise.all([
+      prisma.purchaseOrder.count({ where: { status: { in: ['OPEN', 'PARTIALLY_RECEIVED'] } } }),
+      prisma.receivingReport.count({ where: { createdAt: { gte: today, lt: tomorrow } } }),
+      prisma.discrepancyReport.count(),
+      prisma.receivingReport.findMany({
+        take: 5,
+        include: { po: { include: { supplier: true } } },
+        orderBy: { createdAt: 'desc' }
+      }),
+      prisma.item.findMany({
+        where: { stockStatus: { in: ['LOW_STOCK', 'CRITICAL'] } },
+        include: { inventoryStockStatus: true, supplier: true },
+        take: 10
+      })
+    ]);
+
+    res.json({ pendingDeliveries, todaysReceipts, openDiscrepancies, recentReceipts, stockAlerts });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/deliveries', async (req, res) => {
+  try {
+    const { poNo, supplier, dateFrom, dateTo, status } = req.query;
+    const filters: any = {
+      status: status ? String(status) : { in: ['OPEN', 'PARTIALLY_RECEIVED'] }
+    };
+    if (poNo) filters.poNumber = { contains: String(poNo), mode: 'insensitive' };
+    if (dateFrom || dateTo) {
+      filters.date = {};
+      if (dateFrom) filters.date.gte = new Date(String(dateFrom));
+      if (dateTo) filters.date.lte = new Date(String(dateTo));
+    }
+    if (supplier) {
+      filters.supplier = {
+        OR: [
+          { name: { contains: String(supplier), mode: 'insensitive' } },
+          { vendorCode: { contains: String(supplier), mode: 'insensitive' } }
+        ]
+      };
+    }
+
+    const deliveries = await prisma.purchaseOrder.findMany({
+      where: filters,
+      include: { supplier: true, items: true, pr: true },
+      orderBy: { date: 'desc' }
+    });
+    res.json(deliveries);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 router.get('/', async (req, res) => {
   try {
     const rrs = await prisma.receivingReport.findMany({
@@ -29,14 +103,14 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requireRole('RECEIVING', 'RECEIVING_CLERK', 'ADMIN'), async (req, res) => {
   try {
     const data = req.body;
     
     // Ensure PO exists and is approved
     const po = await prisma.purchaseOrder.findUnique({ 
       where: { id: data.poId }, 
-      include: { items: true, pr: true } 
+      include: { items: true, pr: true, supplier: true } 
     });
     
     if (!po || (po.status !== 'OPEN' && po.status !== 'PARTIALLY_RECEIVED')) {
@@ -51,14 +125,14 @@ router.post('/', async (req, res) => {
         data: {
           rrNumber,
           poId: po.id,
-          receivedFrom: data.receivedFrom || po.supplierId, // Should technically be name, but we link to supplier via supplierId below
+          receivedFrom: data.receivedFrom || po.supplier.name,
           via: data.via || 'Direct Delivery',
           supplierId: po.supplierId,
           poDate: po.date,
           invoiceNo: data.invoiceNo,
           prNumber: po.pr.prNumber,
           receivingPersonnel: (req as any).user?.name || 'SYSTEM',
-          status: 'VERIFIED',
+          status: data.discrepancyItems?.length ? 'DISCREPANCY' : 'VERIFIED',
           items: {
             create: data.items.map((item: any) => ({
               itemNo: item.itemNo,
@@ -78,6 +152,29 @@ router.post('/', async (req, res) => {
         data: { status: 'RECEIVED' } // Simplified logic
       });
 
+      for (const item of data.discrepancyItems || []) {
+        const reportNo = await generateDRNumber();
+        await tx.discrepancyReport.create({
+          data: {
+            reportNo,
+            rrId: newRR.id,
+            reportedBy: (req as any).user?.name || 'SYSTEM',
+            department: 'RECEIVING',
+            location: data.location || 'Warehouse',
+            prNumber: po.pr.prNumber,
+            poNumber: po.poNumber,
+            rrNumber: newRR.rrNumber,
+            supplier: po.supplier.name,
+            descriptionOfIssue: item.descriptionOfIssue || `${item.itemNo || item.description} variance: ${item.varianceQty || ''}`,
+            natureQuantity: true,
+            natureQuality: item.reason === 'DAMAGED',
+            recommendedAction: item.actionTaken || 'For review',
+            receivedBy: data.receivedBy || 'Pending',
+            receivedByPosition: data.receivedByPosition || 'Pending'
+          }
+        });
+      }
+
       // Update Inventory Stock Status
       for (const item of data.items) {
         // find item by description or itemNo
@@ -92,6 +189,16 @@ router.post('/', async (req, res) => {
 
       return newRR;
     });
+
+    const user = auditUser(req);
+    await logAudit(prisma, {
+      ...user,
+      action: 'CREATE',
+      module: 'RR',
+      referenceId: rr.id,
+      referenceNo: rr.rrNumber,
+      details: `Created receiving report ${rr.rrNumber}`
+    });
     
     res.json(rr);
   } catch (error) {
@@ -103,7 +210,7 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const rr = await prisma.receivingReport.findUnique({
-      where: { id: req.params.id },
+      where: { id: String(req.params.id) },
       include: { 
         items: true, 
         po: {

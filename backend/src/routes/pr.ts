@@ -1,6 +1,8 @@
 import express from 'express';
 import prisma from '../utils/prisma';
 import { authenticateToken } from '../middleware/auth';
+import { requireRole } from '../middleware/role';
+import { auditUser, logAudit } from '../utils/audit';
 
 
 const router = express.Router();
@@ -29,7 +31,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requireRole('REQUESTER', 'STORE_MANAGER', 'ADMIN'), async (req, res) => {
   try {
     const prNumber = await generatePRNumber();
     const data = req.body;
@@ -69,6 +71,16 @@ router.post('/', async (req, res) => {
       },
       include: { items: true }
     });
+
+    const user = auditUser(req);
+    await logAudit(prisma, {
+      ...user,
+      action: 'CREATE',
+      module: 'PR',
+      referenceId: pr.id,
+      referenceNo: pr.prNumber,
+      details: `Created purchase requisition ${pr.prNumber}`
+    });
     
     res.json(pr);
   } catch (error) {
@@ -80,7 +92,7 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const pr = await prisma.purchaseRequisition.findUnique({
-      where: { id: req.params.id },
+      where: { id: String(req.params.id) },
       include: { items: true }
     });
     if (!pr) return res.status(404).json({ error: 'Not found' });
@@ -93,8 +105,17 @@ router.get('/:id', async (req, res) => {
 router.post('/:id/submit', async (req, res) => {
   try {
     const pr = await prisma.purchaseRequisition.update({
-      where: { id: req.params.id },
+      where: { id: String(req.params.id) },
       data: { status: 'PENDING_APPROVAL' }
+    });
+    const user = auditUser(req);
+    await logAudit(prisma, {
+      ...user,
+      action: 'UPDATE',
+      module: 'PR',
+      referenceId: pr.id,
+      referenceNo: pr.prNumber,
+      details: `Submitted purchase requisition ${pr.prNumber}`
     });
     res.json(pr);
   } catch (error) {
@@ -102,33 +123,51 @@ router.post('/:id/submit', async (req, res) => {
   }
 });
 
-router.post('/:id/approve', async (req, res) => {
+router.post('/:id/approve', requireRole('STORE_MANAGER', 'FINANCE_BUDGETING', 'CFO', 'ADMIN'), async (req, res) => {
   try {
     // Basic RBAC could be enforced here by checking req.user.role vs pr.approvalLevel
     const pr = await prisma.purchaseRequisition.update({
-      where: { id: req.params.id },
+      where: { id: String(req.params.id) },
       data: { 
         status: 'APPROVED',
         approvedBy: (req as any).user?.name || 'Admin',
         approvedAt: new Date()
       }
     });
+    const user = auditUser(req);
+    await logAudit(prisma, {
+      ...user,
+      action: 'APPROVE',
+      module: 'PR',
+      referenceId: pr.id,
+      referenceNo: pr.prNumber,
+      details: `Approved purchase requisition ${pr.prNumber}`
+    });
     res.json(pr);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-router.post('/:id/reject', async (req, res) => {
+router.post('/:id/reject', requireRole('STORE_MANAGER', 'FINANCE_BUDGETING', 'CFO', 'ADMIN'), async (req, res) => {
   try {
     const pr = await prisma.purchaseRequisition.update({
-      where: { id: req.params.id },
+      where: { id: String(req.params.id) },
       data: { 
         status: 'REJECTED',
         rejectedBy: (req as any).user?.name || 'Admin',
         rejectedAt: new Date(),
         rejectionRemarks: req.body.remarks
       }
+    });
+    const user = auditUser(req);
+    await logAudit(prisma, {
+      ...user,
+      action: 'REJECT',
+      module: 'PR',
+      referenceId: pr.id,
+      referenceNo: pr.prNumber,
+      details: `Rejected purchase requisition ${pr.prNumber}`
     });
     res.json(pr);
   } catch (error) {

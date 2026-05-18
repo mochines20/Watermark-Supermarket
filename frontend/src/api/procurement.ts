@@ -24,6 +24,18 @@ export const procurementApi = {
     const response = await api.post('/suppliers', data);
     return response.data;
   },
+  updateSupplier: async (id: string, data: any) => {
+    const response = await api.put(`/suppliers/${id}`, data);
+    return response.data;
+  },
+  getSupplierItems: async (id: string) => {
+    const response = await api.get(`/suppliers/${id}/items`);
+    return response.data;
+  },
+  linkSupplierItems: async (id: string, itemIds: string[]) => {
+    const response = await api.post(`/suppliers/${id}/link-items`, { itemIds });
+    return response.data;
+  },
 
   // Purchase Requisitions
   getPRs: async () => {

@@ -2,6 +2,8 @@ import api from './client';
 
 export const modulesApi = {
   // Receiving
+  getReceivingDashboard: async () => (await api.get('/receiving/dashboard')).data,
+  getDeliveries: async (params?: any) => (await api.get('/receiving/deliveries', { params })).data,
   getReceivingReports: async () => (await api.get('/receiving')).data,
   getReceivingReportById: async (id: string) => (await api.get(`/receiving/${id}`)).data,
   createReceivingReport: async (data: any) => (await api.post('/receiving', data)).data,
@@ -10,7 +12,11 @@ export const modulesApi = {
   createDiscrepancy: async (data: any) => (await api.post('/discrepancies', data)).data,
 
   // Inventory
+  getInventory: async () => (await api.get('/inventory')).data,
   getStockStatus: async () => (await api.get('/inventory/stock')).data,
+  getInventoryAlerts: async () => (await api.get('/inventory/alerts')).data,
+  postInventoryTransaction: async (data: any) => (await api.post('/inventory/transaction', data)).data,
+  getInventoryTransactions: async (id: string) => (await api.get(`/inventory/${id}/transactions`)).data,
   logVariance: async (data: any) => (await api.post('/inventory/variance', data)).data,
 
   // AP
@@ -18,6 +24,7 @@ export const modulesApi = {
   getInvoiceById: async (id: string) => (await api.get(`/ap/invoices/${id}`)).data,
   createInvoice: async (data: any) => (await api.post('/ap/invoices', data)).data,
   getLedger: async () => (await api.get('/ap/ledger')).data,
+  getAging: async () => (await api.get('/ap/aging')).data,
 
   // Vouchers
   getVouchers: async () => (await api.get('/vouchers')).data,

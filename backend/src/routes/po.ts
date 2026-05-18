@@ -1,6 +1,8 @@
 import express from 'express';
 import prisma from '../utils/prisma';
 import { authenticateToken } from '../middleware/auth';
+import { requireRole } from '../middleware/role';
+import { auditUser, logAudit } from '../utils/audit';
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -29,7 +31,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requireRole('PURCHASING', 'PURCHASING_OFFICER', 'ADMIN'), async (req, res) => {
   try {
     const data = req.body;
     
@@ -66,6 +68,21 @@ router.post('/', async (req, res) => {
       },
       include: { items: true }
     });
+
+    await prisma.purchaseRequisition.update({
+      where: { id: pr.id },
+      data: { status: 'CONVERTED_TO_PO', linkedPONumber: po.poNumber }
+    });
+
+    const user = auditUser(req);
+    await logAudit(prisma, {
+      ...user,
+      action: 'CREATE',
+      module: 'PO',
+      referenceId: po.id,
+      referenceNo: po.poNumber,
+      details: `Created purchase order ${po.poNumber}`
+    });
     
     res.json(po);
   } catch (error) {
@@ -77,7 +94,7 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const po = await prisma.purchaseOrder.findUnique({
-      where: { id: req.params.id },
+      where: { id: String(req.params.id) },
       include: { items: true, pr: true, supplier: true }
     });
     if (!po) return res.status(404).json({ error: 'Not found' });
@@ -87,14 +104,23 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/:id/approve', async (req, res) => {
+router.post('/:id/approve', requireRole('PURCHASING', 'PURCHASING_OFFICER', 'ADMIN'), async (req, res) => {
   try {
     const po = await prisma.purchaseOrder.update({
-      where: { id: req.params.id },
+      where: { id: String(req.params.id) },
       data: { 
         approvedBy: (req as any).user?.name || 'Admin',
         approvedAt: new Date()
       }
+    });
+    const user = auditUser(req);
+    await logAudit(prisma, {
+      ...user,
+      action: 'APPROVE',
+      module: 'PO',
+      referenceId: po.id,
+      referenceNo: po.poNumber,
+      details: `Approved purchase order ${po.poNumber}`
     });
     res.json(po);
   } catch (error) {

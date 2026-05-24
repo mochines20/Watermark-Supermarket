@@ -23,16 +23,26 @@ router.post('/', requireRole('ADMIN'), async (req, res) => {
   try {
     const { vendorCode, name, address, contactPerson, contactDetails, email, tin, paymentTerms, creditLimit } = req.body;
     
-    const duplicateVendor = await prisma.supplier.findFirst({
-      where: { OR: [{ name }, { email }] }
+    // Consolidated duplicate check for vendorCode, name, and email
+    const duplicate = await prisma.supplier.findFirst({
+      where: {
+        OR: [
+          { vendorCode },
+          { name },
+          { email }
+        ]
+      }
     });
-    if (duplicateVendor) {
-      return res.status(409).json({ error: 'Vendor already exists', supplier: duplicateVendor });
-    }
-
-    const existing = await prisma.supplier.findUnique({ where: { vendorCode } });
-    if (existing) {
-      return res.status(400).json({ error: 'Vendor code already exists' });
+    if (duplicate) {
+      if (duplicate.vendorCode === vendorCode) {
+        return res.status(400).json({ error: 'Vendor code already exists' });
+      }
+      if (duplicate.name === name) {
+        return res.status(409).json({ error: 'Vendor name already exists' });
+      }
+      if (duplicate.email === email) {
+        return res.status(409).json({ error: 'Vendor email already exists' });
+      }
     }
 
     const supplier = await prisma.supplier.create({
@@ -48,7 +58,7 @@ router.post('/', requireRole('ADMIN'), async (req, res) => {
         creditLimit: Number(creditLimit || 0),
         status: 'ACTIVE',
         isAccredited: false, // Must be explicitly accredited
-        accreditedDate: new Date() // Placeholder, normally updated upon accreditation
+        accreditedDate: new Date() // Set to current date, will be updated on accreditation
       }
     });
 

@@ -15,6 +15,15 @@ export const modulesApi = {
   getInventory: async () => (await api.get('/inventory')).data,
   getStockStatus: async () => (await api.get('/inventory/stock')).data,
   getInventoryAlerts: async () => (await api.get('/inventory/alerts')).data,
+  getAuditLogs: async (params?: any) => {
+    const cleanedParams = params ? { ...params } : {};
+    Object.keys(cleanedParams).forEach((key) => {
+      if (cleanedParams[key] === undefined || cleanedParams[key] === null) {
+        delete cleanedParams[key];
+      }
+    });
+    return (await api.get('/audit', { params: cleanedParams })).data;
+  },
   postInventoryTransaction: async (data: any) => (await api.post('/inventory/transaction', data)).data,
   getInventoryTransactions: async (id: string) => (await api.get(`/inventory/${id}/transactions`)).data,
   logVariance: async (data: any) => (await api.post('/inventory/variance', data)).data,

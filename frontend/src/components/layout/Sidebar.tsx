@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -13,8 +14,24 @@ import {
   Building2 
 } from 'lucide-react';
 import logoImage from '../../assets/logo.jpg';
+import { modulesApi } from '../../api/modulesApi';
 
 const Sidebar = () => {
+  const [alertCount, setAlertCount] = useState<number>(0);
+
+  useEffect(() => {
+    const loadAlerts = async () => {
+      try {
+        const alerts = await modulesApi.getInventoryAlerts();
+        setAlertCount(Array.isArray(alerts) ? alerts.length : 0);
+      } catch (error) {
+        console.error('Failed to load reorder alert count', error);
+      }
+    };
+
+    loadAlerts();
+  }, []);
+
   return (
     <aside className="no-print w-[260px] h-screen fixed left-0 top-0 flex flex-col bg-[#0D2D49]/85 backdrop-blur-md border-r border-[#A1B6D0]/15 z-50">
       <div className="p-6 flex items-center gap-3">
@@ -66,7 +83,7 @@ const Sidebar = () => {
               <NavLink to="/inventory/stock" className={({isActive}) => `block py-1.5 text-sm transition-colors ${isActive ? 'text-[#4FD3EC] font-medium' : 'text-gray-400 hover:text-white'}`}>Stock Status</NavLink>
               <NavLink to="/inventory/alerts" className={({isActive}) => `flex items-center justify-between py-1.5 text-sm transition-colors ${isActive ? 'text-[#4FD3EC] font-medium' : 'text-gray-400 hover:text-white'}`}>
                 <span>Reorder Alerts</span>
-                <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">3</span>
+                <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">{alertCount}</span>
               </NavLink>
             </div>
           </div>
@@ -119,6 +136,10 @@ const Sidebar = () => {
           <NavLink to="/settings" className={({isActive}) => `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive ? 'nav-active' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}>
             <Settings className="w-5 h-5" />
             <span className="text-sm font-medium">Settings</span>
+          </NavLink>
+          <NavLink to="/settings/audit" className={({isActive}) => `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive ? 'nav-active' : 'text-gray-300 hover:text-white hover:bg-white/5'}`}>
+            <FileText className="w-5 h-5" />
+            <span className="text-sm font-medium">Audit Logs</span>
           </NavLink>
         </div>
       </div>

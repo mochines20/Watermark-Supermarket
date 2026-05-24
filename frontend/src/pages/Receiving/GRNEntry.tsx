@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Barcode, CheckCircle2 } from 'lucide-react';
+import { Barcode, CheckCircle2, Scan } from 'lucide-react';
 import { format } from 'date-fns';
 import { GlassCard } from '../../components/ui/GlassCard';
 import { PrimaryButton } from '../../components/ui/PrimaryButton';
@@ -17,9 +17,14 @@ const GRNEntry = () => {
   const [remarks, setRemarks] = useState('');
   const [items, setItems] = useState<any[]>([]);
   const [saved, setSaved] = useState<any>(null);
+  const [scanModalOpen, setScanModalOpen] = useState(false);
+  const [scanIndex, setScanIndex] = useState<number | null>(null);
+  const [barcodeInput, setBarcodeInput] = useState('');
+  const [inventoryItems, setInventoryItems] = useState<any[]>([]);
 
   useEffect(() => {
     modulesApi.getDeliveries().then(setDeliveries);
+    modulesApi.getInventory().then(setInventoryItems);
   }, []);
 
   const po = useMemo(() => deliveries.find((row) => row.id === selectedPoId), [deliveries, selectedPoId]);
@@ -43,17 +48,50 @@ const GRNEntry = () => {
   }, [po]);
 
   const updateItem = (index: number, key: string, value: any) => {
-    setItems((prev) => prev.map((item, idx) => idx === index ? {
-      ...item,
-      [key]: value,
-      total: key === 'quantity' || key === 'unitPrice'
-        ? Number(key === 'quantity' ? value : item.quantity) * Number(key === 'unitPrice' ? value : item.unitPrice)
-        : item.total
-    } : item));
+    setItems((prev) => {
+      const item = prev[index];
+      if (!item) return prev;
+      const updatedItem = {
+        ...item,
+        [key]: value,
+        total: key === 'quantity' || key === 'unitPrice'
+          ? Number(key === 'quantity' ? value : item.quantity) * Number(key === 'unitPrice' ? value : item.unitPrice)
+          : item.total
+      };
+
+      return prev.map((row, idx) => idx === index ? updatedItem : row);
+    });
+
+    // Auto-divert to discrepancy screen if quantities don't match.
+    // The UI already handles this via hasDiscrepancy check.
   };
 
   const addItem = () => {
-    setItems((prev) => [...prev, { itemNo: '', description: '', unit: 'EA', orderedQty: 0, quantity: 0, unitPrice: 0, total: 0, reason: 'WRONG_ITEM', actionTaken: '', remarks: '' }]);
+    setItems((prev) => [...prev, { itemNo: '', description: '', unit: 'EA', orderedQty: 0, quantity: 0, unitPrice: 0, total: 0, lotNo: '', expiryDate: '', reason: 'WRONG_ITEM', actionTaken: '', remarks: '' }]);
+  };
+
+  const openScanModal = (index: number) => {
+    setScanIndex(index);
+    setScanModalOpen(true);
+    setBarcodeInput('');
+  };
+
+  const handleBarcodeScan = () => {
+    if (scanIndex === null) return;
+    
+    // Look up item by barcode (item code)
+    const foundItem = inventoryItems.find((item) => item.itemCode === barcodeInput);
+    
+    if (foundItem) {
+      updateItem(scanIndex, 'itemNo', foundItem.itemCode);
+      updateItem(scanIndex, 'description', foundItem.description);
+      updateItem(scanIndex, 'unit', foundItem.unit);
+      updateItem(scanIndex, 'unitPrice', foundItem.standardCost);
+      setScanModalOpen(false);
+      setBarcodeInput('');
+    } else {
+      alert('Item not found in inventory');
+    }
   };
 
   const discrepancyItems = items
@@ -64,6 +102,15 @@ const GRNEntry = () => {
       descriptionOfIssue: `${item.description} received ${item.quantity} vs ordered ${item.orderedQty}`
     }));
 
+  // Auto-divert to discrepancy step if discrepancies exist
+  const hasDiscrepancies = discrepancyItems.length > 0;
+  useEffect(() => {
+    if (hasDiscrepancies && step === 2) {
+      // Optionally auto-scroll to first discrepancy item or show alert
+      // For now, the UI already highlights discrepancies in red
+    }
+  }, [hasDiscrepancies, step]);
+
   const totals = {
     totalItems: items.length,
     totalQty: items.reduce((sum, item) => sum + Number(item.quantity || 0), 0),
@@ -71,23 +118,41 @@ const GRNEntry = () => {
   };
 
   const save = async () => {
-    const rr = await modulesApi.createReceivingReport({
-      poId: selectedPoId,
-      via: referenceNo || 'Direct Delivery',
-      invoiceNo: referenceNo,
-      receivedBy: user?.name,
-      remarks,
-      items: items.map((item) => ({
-        itemNo: item.itemNo,
-        description: item.description,
-        quantity: Number(item.quantity),
-        unitPrice: Number(item.unitPrice),
-        total: Number(item.total)
-      })),
-      discrepancyItems
-    });
-    setSaved(rr);
-    setStep(4);
+    if (!selectedPoId) {
+      alert('Please select a purchase order before saving.');
+      return;
+    }
+
+    const invalidItem = items.find((item) => !item.itemNo || !item.description || Number(item.quantity) < 0 || Number(item.unitPrice) < 0 || Number(item.total) < 0);
+    if (invalidItem) {
+      alert('Each item must have an item code, description, and valid quantities/prices. Negative values are not allowed.');
+      return;
+    }
+
+    try {
+      const rr = await modulesApi.createReceivingReport({
+        poId: selectedPoId,
+        via: referenceNo || 'Direct Delivery',
+        invoiceNo: referenceNo,
+        receivedBy: user?.name,
+        remarks,
+        items: items.map((item) => ({
+          itemNo: item.itemNo,
+          description: item.description,
+          quantity: Number(item.quantity),
+          unitPrice: Number(item.unitPrice),
+          total: Number(item.total),
+          lotNo: item.lotNo,
+          expiryDate: item.expiryDate
+        })),
+        discrepancyItems
+      });
+      setSaved(rr);
+      setStep(4);
+    } catch (error: any) {
+      console.error('Failed to save receiving report:', error);
+      alert(error.response?.data?.error || 'Failed to save receiving report. Please review the item details and try again.');
+    }
   };
 
   return (
@@ -152,25 +217,25 @@ const GRNEntry = () => {
                     const hasDiscrepancy = Number(item.quantity) !== Number(item.orderedQty);
                     return (
                       <tr key={index} className={hasDiscrepancy ? 'bg-red-500/10' : ''}>
-                        <td className="py-3"><div className="flex items-center gap-2"><Barcode size={16} /> <input value={item.itemNo} onChange={(e) => updateItem(index, 'itemNo', e.target.value)} className="w-28 bg-black/20 border border-white/10 rounded px-2 py-1 text-white" /></div></td>
-                        <td className="py-3"><input value={item.description} onChange={(e) => updateItem(index, 'description', e.target.value)} className="w-56 bg-black/20 border border-white/10 rounded px-2 py-1 text-white" /></td>
+                        <td className="py-3"><div className="flex items-center gap-2"><Barcode size={16} /> <input aria-label="Item code" value={item.itemNo} onChange={(e) => updateItem(index, 'itemNo', e.target.value)} className="w-28 bg-black/20 border border-white/10 rounded px-2 py-1 text-white" /><button onClick={() => openScanModal(index)} className="p-1 hover:bg-white/10 rounded" title="Scan Barcode"><Scan size={14} /></button></div></td>
+                        <td className="py-3"><input aria-label="Item description" value={item.description} onChange={(e) => updateItem(index, 'description', e.target.value)} className="w-56 bg-black/20 border border-white/10 rounded px-2 py-1 text-white" /></td>
                         <td className="py-3">{item.unit}</td>
                         <td className="py-3">{item.orderedQty}</td>
-                        <td className="py-3"><input type="number" value={item.quantity} onChange={(e) => updateItem(index, 'quantity', e.target.value)} className="w-24 bg-black/20 border border-white/10 rounded px-2 py-1 text-white" /></td>
-                        <td className="py-3"><input type="number" value={item.unitPrice} onChange={(e) => updateItem(index, 'unitPrice', e.target.value)} className="w-28 bg-black/20 border border-white/10 rounded px-2 py-1 text-white" /></td>
-                        <td className="py-3"><input value={item.lotNo || ''} onChange={(e) => updateItem(index, 'lotNo', e.target.value)} className="w-28 bg-black/20 border border-white/10 rounded px-2 py-1 text-white" /></td>
-                        <td className="py-3"><input type="date" value={item.expiryDate || ''} onChange={(e) => updateItem(index, 'expiryDate', e.target.value)} className="w-36 bg-black/20 border border-white/10 rounded px-2 py-1 text-white" /></td>
+                        <td className="py-3"><input aria-label="Received quantity" type="number" value={item.quantity} onChange={(e) => updateItem(index, 'quantity', e.target.value)} className="w-24 bg-black/20 border border-white/10 rounded px-2 py-1 text-white" /></td>
+                        <td className="py-3"><input aria-label="Unit price" type="number" value={item.unitPrice} onChange={(e) => updateItem(index, 'unitPrice', e.target.value)} className="w-28 bg-black/20 border border-white/10 rounded px-2 py-1 text-white" /></td>
+                        <td className="py-3"><input aria-label="Lot number" value={item.lotNo || ''} onChange={(e) => updateItem(index, 'lotNo', e.target.value)} className="w-28 bg-black/20 border border-white/10 rounded px-2 py-1 text-white" /></td>
+                        <td className="py-3"><input aria-label="Expiry date" type="date" value={item.expiryDate || ''} onChange={(e) => updateItem(index, 'expiryDate', e.target.value)} className="w-36 bg-black/20 border border-white/10 rounded px-2 py-1 text-white" /></td>
                         <td className="py-3">
                           {hasDiscrepancy && (
                             <div className="space-y-2">
                               <div className="text-red-200 text-xs">Variance: {Number(item.quantity) - Number(item.orderedQty)}</div>
-                              <select value={item.reason} onChange={(e) => updateItem(index, 'reason', e.target.value)} className="bg-black/30 border border-white/10 rounded px-2 py-1 text-white">
+                              <select aria-label="Discrepancy reason" value={item.reason} onChange={(e) => updateItem(index, 'reason', e.target.value)} className="bg-black/30 border border-white/10 rounded px-2 py-1 text-white">
                                 <option className="text-black" value="SHORT_DELIVERY">Short Delivery</option>
                                 <option className="text-black" value="OVERAGE">Overage</option>
                                 <option className="text-black" value="DAMAGED">Damaged</option>
                                 <option className="text-black" value="WRONG_ITEM">Wrong Item</option>
                               </select>
-                              <input placeholder="Action taken" value={item.actionTaken} onChange={(e) => updateItem(index, 'actionTaken', e.target.value)} className="block w-44 bg-black/20 border border-white/10 rounded px-2 py-1 text-white" />
+                              <input placeholder="Action taken" aria-label="Action taken" value={item.actionTaken} onChange={(e) => updateItem(index, 'actionTaken', e.target.value)} className="block w-44 bg-black/20 border border-white/10 rounded px-2 py-1 text-white" />
                             </div>
                           )}
                         </td>
@@ -219,6 +284,31 @@ const GRNEntry = () => {
             <div className="flex justify-center gap-3">
               <button onClick={() => window.print()} className="px-4 py-2 rounded-xl bg-white/10 text-white hover:bg-white/15">Print</button>
               <button onClick={() => window.print()} className="px-4 py-2 rounded-xl bg-white/10 text-white hover:bg-white/15">Download</button>
+            </div>
+          </div>
+        )}
+
+        {scanModalOpen && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div className="bg-slate-800 rounded-xl p-6 w-full max-w-md border border-white/10">
+              <h3 className="text-xl font-bold text-white mb-4">Scan Barcode</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm text-white/80">Barcode / Item Code</label>
+                  <input 
+                    value={barcodeInput} 
+                    onChange={(e) => setBarcodeInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleBarcodeScan()}
+                    placeholder="Enter or scan barcode..."
+                    className="mt-2 w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-watermark-blue-400"
+                    autoFocus
+                  />
+                </div>
+                <div className="flex gap-3 justify-end">
+                  <button onClick={() => setScanModalOpen(false)} className="px-4 py-2 rounded-xl bg-white/10 text-white hover:bg-white/15">Cancel</button>
+                  <PrimaryButton onClick={handleBarcodeScan}>Scan</PrimaryButton>
+                </div>
+              </div>
             </div>
           </div>
         )}

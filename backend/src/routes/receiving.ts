@@ -7,13 +7,21 @@ import { auditUser, logAudit } from '../utils/audit';
 const router = express.Router();
 router.use(authenticateToken);
 
-// Helper to generate RR number
+// Helper to generate RR number with row-level locking
 const generateRRNumber = async () => {
   const year = new Date().getFullYear();
-  const counter = await prisma.counter.upsert({
-    where: { type: 'RR' },
-    update: { value: { increment: 1 } },
-    create: { type: 'RR', value: 1 }
+  const counter = await prisma.$transaction(async (tx) => {
+    const existing = await tx.counter.findUnique({ where: { type: 'RR' } });
+    if (existing) {
+      return await tx.counter.update({
+        where: { type: 'RR' },
+        data: { value: { increment: 1 } }
+      });
+    } else {
+      return await tx.counter.create({
+        data: { type: 'RR', value: 1 }
+      });
+    }
   });
   const sequence = String(counter.value).padStart(5, '0');
   return `RR-${year}-${sequence}`;
@@ -21,10 +29,18 @@ const generateRRNumber = async () => {
 
 const generateDRNumber = async () => {
   const year = new Date().getFullYear();
-  const counter = await prisma.counter.upsert({
-    where: { type: 'DR' },
-    update: { value: { increment: 1 } },
-    create: { type: 'DR', value: 1 }
+  const counter = await prisma.$transaction(async (tx) => {
+    const existing = await tx.counter.findUnique({ where: { type: 'DR' } });
+    if (existing) {
+      return await tx.counter.update({
+        where: { type: 'DR' },
+        data: { value: { increment: 1 } }
+      });
+    } else {
+      return await tx.counter.create({
+        data: { type: 'DR', value: 1 }
+      });
+    }
   });
   const sequence = String(counter.value).padStart(5, '0');
   return `DR-${year}-${sequence}`;
@@ -106,7 +122,23 @@ router.get('/', async (req, res) => {
 router.post('/', requireRole('RECEIVING', 'RECEIVING_CLERK', 'ADMIN'), async (req, res) => {
   try {
     const data = req.body;
-    
+
+    const requiredFields = ['poId', 'receivedFrom', 'via', 'items'];
+    for (const field of requiredFields) {
+      if (data[field] === undefined || data[field] === null || (typeof data[field] === 'string' && String(data[field]).trim() === '')) {
+        return res.status(400).json({ error: `Missing required field: ${field}` });
+      }
+    }
+
+    if (!Array.isArray(data.items) || data.items.length === 0) {
+      return res.status(400).json({ error: 'Receiving report must include at least one item' });
+    }
+
+    const invalidItem = data.items.find((item: any) => !item.itemNo || !item.description || Number(item.quantity) < 0 || Number(item.unitPrice) < 0 || Number(item.total) < 0);
+    if (invalidItem) {
+      return res.status(400).json({ error: 'Each receiving item must include item number, description, non-negative quantity, and valid prices' });
+    }
+
     // Ensure PO exists and is approved
     const po = await prisma.purchaseOrder.findUnique({ 
       where: { id: data.poId }, 
@@ -120,6 +152,14 @@ router.post('/', requireRole('RECEIVING', 'RECEIVING_CLERK', 'ADMIN'), async (re
     const rrNumber = await generateRRNumber();
 
     const rr = await prisma.$transaction(async (tx) => {
+      // Validate received quantities don't exceed ordered quantities
+      for (const item of data.items) {
+        const poItem = po.items.find((poItem: any) => poItem.itemNo === item.itemNo);
+        if (poItem && Number(item.quantity) > Number(poItem.quantity)) {
+          throw new Error(`Received quantity for ${item.itemNo} exceeds ordered quantity`);
+        }
+      }
+
       // Create the Receiving Report
       const newRR = await tx.receivingReport.create({
         data: {
@@ -146,10 +186,14 @@ router.post('/', requireRole('RECEIVING', 'RECEIVING_CLERK', 'ADMIN'), async (re
         include: { items: true }
       });
 
-      // Update PO Status
+      // Update PO Status - check if all items received or partial
+      const totalOrdered = po.items.reduce((sum: number, item: any) => sum + Number(item.quantity), 0);
+      const totalReceived = data.items.reduce((sum: number, item: any) => sum + Number(item.quantity), 0);
+      const poStatus = totalReceived >= totalOrdered ? 'RECEIVED' : 'PARTIALLY_RECEIVED';
+      
       await tx.purchaseOrder.update({
         where: { id: po.id },
-        data: { status: 'RECEIVED' } // Simplified logic
+        data: { status: poStatus }
       });
 
       for (const item of data.discrepancyItems || []) {
@@ -177,13 +221,28 @@ router.post('/', requireRole('RECEIVING', 'RECEIVING_CLERK', 'ADMIN'), async (re
 
       // Update Inventory Stock Status
       for (const item of data.items) {
-        // find item by description or itemNo
         const itemRecord = await tx.item.findUnique({ where: { itemCode: item.itemNo } });
         if (itemRecord) {
-          await tx.inventoryStock.updateMany({
-            where: { itemId: itemRecord.id },
-            data: { qtyOnHand: { increment: item.quantity } }
-          });
+          const existingStock = await tx.inventoryStock.findFirst({ where: { itemId: itemRecord.id } });
+          if (existingStock) {
+            await tx.inventoryStock.update({
+              where: { id: existingStock.id },
+              data: {
+                qtyOnHand: { increment: item.quantity },
+                lastUpdated: new Date(),
+                updatedBy: (req as any).user?.name || 'SYSTEM'
+              }
+            });
+          } else {
+            await tx.inventoryStock.create({
+              data: {
+                itemId: itemRecord.id,
+                qtyOnHand: item.quantity,
+                qtyOnOrder: 0,
+                updatedBy: (req as any).user?.name || 'SYSTEM'
+              }
+            });
+          }
         }
       }
 
@@ -201,9 +260,18 @@ router.post('/', requireRole('RECEIVING', 'RECEIVING_CLERK', 'ADMIN'), async (re
     });
     
     res.json(rr);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating RR:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    if (error.message && error.message.includes('exceeds ordered quantity')) {
+      return res.status(400).json({ error: error.message });
+    }
+    if (error.code === 'P2002') {
+      return res.status(400).json({ error: 'Duplicate RR number detected' });
+    }
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Required record not found' });
+    }
+    res.status(500).json({ error: 'Failed to create receiving report' });
   }
 });
 

@@ -47,6 +47,34 @@ const PurchaseOrder = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!prId) {
+      toast.error('Please select an approved Purchase Requisition');
+      return;
+    }
+    if (!supplierId) {
+      toast.error('Please select a supplier');
+      return;
+    }
+    if (!expectedDeliveryDate) {
+      toast.error('Please enter the expected delivery date');
+      return;
+    }
+    
+    // Validate delivery date is in the future
+    const deliveryDate = new Date(expectedDeliveryDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (deliveryDate < today) {
+      toast.error('Expected delivery date must be today or in the future');
+      return;
+    }
+
+    if (!window.confirm('Confirm creation of this Purchase Order?')) {
+      return;
+    }
+    
     try {
       await procurementApi.createPO({
         prId,
@@ -61,7 +89,8 @@ const PurchaseOrder = () => {
       toast.success('Purchase Order generated successfully!');
     } catch (error: any) {
       console.error('Failed to submit PO:', error);
-      toast.error(error.response?.data?.error || 'Error creating PO');
+      const errorMessage = error.response?.data?.error || 'Error creating PO. Please try again.';
+      toast.error(errorMessage);
     }
   };
 
@@ -90,7 +119,10 @@ const PurchaseOrder = () => {
     }
   };
 
-  const formatMoney = (value: any) => `₱${Number(value || 0).toLocaleString()}`;
+  const formatMoney = (value: any) => {
+    const amount = Number(value || 0);
+    return `₱${Number.isFinite(amount) ? amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}`;
+  };
 
   if (loading) {
     return (
@@ -133,6 +165,7 @@ const PurchaseOrder = () => {
           <button 
             onClick={() => setShowForm(false)}
             className="absolute top-4 right-4 text-white/50 hover:text-white"
+            aria-label="Close purchase order form"
           >
             <X size={24} />
           </button>
@@ -142,8 +175,9 @@ const PurchaseOrder = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-white/80">Approved PR Reference</label>
+                <label htmlFor="approved-pr-reference" className="text-sm font-medium text-white/80">Approved PR Reference</label>
                 <select 
+                  id="approved-pr-reference"
                   className="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-watermark-blue-400 focus:bg-white/10 transition-all"
                   value={prId}
                   onChange={(e) => setPrId(e.target.value)}
@@ -159,8 +193,9 @@ const PurchaseOrder = () => {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-white/80">Supplier / Vendor</label>
+                <label htmlFor="supplier-vendor" className="text-sm font-medium text-white/80">Supplier / Vendor</label>
                 <select 
+                  id="supplier-vendor"
                   className="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-watermark-blue-400 focus:bg-white/10 transition-all"
                   value={supplierId}
                   onChange={(e) => setSupplierId(e.target.value)}
@@ -224,7 +259,7 @@ const PurchaseOrder = () => {
                     </td>
                     <td className="py-4 text-white/70">{format(new Date(po.createdAt), 'MMM dd, yyyy')}</td>
                     <td className="py-4">{po.expectedDeliveryDate ? format(new Date(po.expectedDeliveryDate), 'MMM dd, yyyy') : 'TBD'}</td>
-                    <td className="py-4 font-medium">₱{Number(po.totalAmount).toLocaleString()}</td>
+                    <td className="py-4 font-medium">₱{Number(po.total).toLocaleString()}</td>
                     <td className="py-4"><StatusBadge status={po.status} /></td>
                     <td className="py-4 text-right">
                       <button
@@ -336,11 +371,11 @@ const PurchaseOrder = () => {
               <table className="wm-table">
                 <thead>
                   <tr>
-                    <th style={{ width: '15%' }}>Item No.</th>
-                    <th style={{ width: '10%' }}>Qty.</th>
+                    <th className="wm-col-15">Item No.</th>
+                    <th className="wm-col-10">Qty.</th>
                     <th>Item Description</th>
-                    <th style={{ width: '18%' }}>Unit Price (PHP)</th>
-                    <th style={{ width: '18%' }}>Amount (PHP)</th>
+                    <th className="wm-col-18">Unit Price (PHP)</th>
+                    <th className="wm-col-18">Amount (PHP)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -394,11 +429,11 @@ const PurchaseOrder = () => {
               <table className="wm-approval">
                 <tbody>
                   <tr>
-                    <td style={{ width: '50%' }}>
+                    <td className="wm-col-50">
                       Prepared By
                       <div className="wm-sign-line">Signature / Date</div>
                     </td>
-                    <td style={{ width: '50%' }}>
+                    <td className="wm-col-50">
                       Approved By
                       <div className="wm-sign-line">Signature / Date</div>
                     </td>

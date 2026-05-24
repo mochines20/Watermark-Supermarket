@@ -105,7 +105,7 @@ router.post('/transaction', requireRole('INVENTORY_CUSTODIAN', 'RECEIVING', 'REC
       await tx.inventoryStock.update({
         where: { id: stock.id },
         data: {
-          qtyOnHand: Math.trunc(newQty),
+          qtyOnHand: newQty,
           lastUpdated: new Date(),
           updatedBy: userId
         }
@@ -195,33 +195,37 @@ router.post('/variance', requireRole('INVENTORY_CUSTODIAN', 'ADMIN'), async (req
   try {
     const { items } = req.body;
     
-    const report = await prisma.inventoryVarianceReport.create({
-      data: {
-        preparedBy: (req as any).user?.name || 'SYSTEM',
-        items: {
-          create: items.map((i: any) => ({
-            itemCode: i.itemCode,
-            description: i.description,
-            systemQty: i.systemQty,
-            physicalQty: i.physicalQty,
-            variance: i.physicalQty - i.systemQty,
-            remarks: i.remarks
-          }))
+    const report = await prisma.$transaction(async (tx) => {
+      const newReport = await tx.inventoryVarianceReport.create({
+        data: {
+          preparedBy: (req as any).user?.name || 'SYSTEM',
+          items: {
+            create: items.map((i: any) => ({
+              itemCode: i.itemCode,
+              description: i.description,
+              systemQty: i.systemQty,
+              physicalQty: i.physicalQty,
+              variance: i.physicalQty - i.systemQty,
+              remarks: i.remarks
+            }))
+          }
+        },
+        include: { items: true }
+      });
+      
+      // Automatically adjust inventory stock to match physical quantity within transaction
+      for (const i of items) {
+        const itemRecord = await tx.item.findUnique({ where: { itemCode: i.itemCode } });
+        if (itemRecord) {
+          await tx.inventoryStock.updateMany({
+            where: { itemId: itemRecord.id },
+            data: { qtyOnHand: i.physicalQty }
+          });
         }
-      },
-      include: { items: true }
-    });
-    
-    // Automatically adjust inventory stock to match physical quantity
-    for (const i of items) {
-      const itemRecord = await prisma.item.findUnique({ where: { itemCode: i.itemCode } });
-      if (itemRecord) {
-        await prisma.inventoryStock.updateMany({
-          where: { itemId: itemRecord.id },
-          data: { qtyOnHand: i.physicalQty }
-        });
       }
-    }
+
+      return newReport;
+    });
 
     const user = auditUser(req);
     await logAudit(prisma, {
@@ -235,7 +239,7 @@ router.post('/variance', requireRole('INVENTORY_CUSTODIAN', 'ADMIN'), async (req
     res.json(report);
   } catch (error) {
     console.error('Error creating variance report:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Failed to create variance report' });
   }
 });
 

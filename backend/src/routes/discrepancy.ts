@@ -33,7 +33,14 @@ router.get('/', async (req, res) => {
 router.post('/', requireRole('RECEIVING', 'RECEIVING_CLERK', 'ADMIN'), async (req, res) => {
   try {
     const data = req.body;
-    
+
+    const requiredFields = ['rrId', 'poNumber', 'supplier', 'descriptionOfIssue', 'recommendedAction'];
+    for (const field of requiredFields) {
+      if (!data[field]) {
+        return res.status(400).json({ error: `Missing required field: ${field}` });
+      }
+    }
+
     const rr = await prisma.receivingReport.findUnique({ where: { id: data.rrId } });
     if (!rr) return res.status(404).json({ error: 'Receiving Report not found' });
 

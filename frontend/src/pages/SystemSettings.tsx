@@ -1,19 +1,27 @@
+import { useNavigate } from 'react-router-dom';
 import { GlassCard } from '../components/ui/GlassCard';
 import { PrimaryButton } from '../components/ui/PrimaryButton';
 import { GlassInput } from '../components/ui/GlassInput';
 import { Save, Server, ShieldCheck, Bell } from 'lucide-react';
 
 const SystemSettings = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="p-8 space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white tracking-tight">System Settings</h1>
           <p className="text-watermark-blue-200 mt-1">Configure global application parameters</p>
         </div>
-        <PrimaryButton icon={<Save size={18} />}>
-          Save Changes
-        </PrimaryButton>
+        <div className="flex flex-wrap gap-3">
+          <PrimaryButton icon={<ShieldCheck size={18} />} onClick={() => navigate('/settings/audit')}>
+            View Audit Logs
+          </PrimaryButton>
+          <PrimaryButton icon={<Save size={18} />}>
+            Save Changes
+          </PrimaryButton>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

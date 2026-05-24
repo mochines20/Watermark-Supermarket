@@ -22,6 +22,7 @@ import ReceivingDashboard from './pages/Receiving/ReceivingDashboard';
 import DeliveryList from './pages/Receiving/DeliveryList';
 import GRNEntry from './pages/Receiving/GRNEntry';
 import AccountingDashboard from './pages/Accounting/AccountingDashboard';
+import AuditLogs from './pages/AuditLogs';
 import DVReview from './pages/Disbursement/DVReview';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -81,6 +82,7 @@ function App() {
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="users" element={<UserManagement />} />
           <Route path="settings" element={<SystemSettings />} />
+          <Route path="settings/audit" element={<AuditLogs />} />
         </Route>
       </Routes>
     </BrowserRouter>

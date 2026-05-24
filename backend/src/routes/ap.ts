@@ -36,10 +36,73 @@ router.post('/invoices', requireRole('ACCOUNTING', 'AP_CLERK', 'ADMIN'), async (
   try {
     const data = req.body;
 
+    const requiredFields = ['invoiceNo', 'poNumber', 'rrNumber', 'invoiceDate', 'dueDate', 'grossAmount', 'netAmount', 'vatAmount', 'totalAmountDue'];
+    for (const field of requiredFields) {
+      if (data[field] === undefined || data[field] === null || String(data[field]).trim() === '') {
+        return res.status(400).json({ error: `Missing required field: ${field}` });
+      }
+    }
+
+    if (!Array.isArray(data.items) || data.items.length === 0) {
+      return res.status(400).json({ error: 'Invoice must include at least one line item' });
+    }
+
+    const existingInvoice = await prisma.supplierInvoice.findUnique({
+      where: { invoiceNo: data.invoiceNo }
+    });
+    if (existingInvoice) {
+      return res.status(400).json({ error: 'Duplicate invoice: Invoice number already exists' });
+    }
+
     const po = await prisma.purchaseOrder.findUnique({ where: { poNumber: data.poNumber }, include: { items: true } });
-    const rr = await prisma.receivingReport.findUnique({ where: { rrNumber: data.rrNumber }, include: { items: true } });
-    
     if (!po) return res.status(400).json({ error: 'Invalid PO Number' });
+
+    const rr = await prisma.receivingReport.findUnique({ where: { rrNumber: data.rrNumber }, include: { items: true } });
+    if (!rr) return res.status(400).json({ error: 'Invalid RR Number' });
+    if (rr.poId !== po.id) {
+      return res.status(400).json({ error: 'Receiving Report does not match the selected Purchase Order' });
+    }
+
+    // Validate invoice date and due date
+    const invoiceDate = new Date(data.invoiceDate);
+    const dueDate = new Date(data.dueDate);
+    if (Number.isNaN(invoiceDate.getTime()) || Number.isNaN(dueDate.getTime())) {
+      return res.status(400).json({ error: 'Invalid invoice or due date' });
+    }
+    if (dueDate <= invoiceDate) {
+      return res.status(400).json({ error: 'Due date must be after invoice date' });
+    }
+
+    const lineItems = data.items.map((item: any, idx: number) => {
+      const qty = Number(item.qty);
+      const unitPrice = Number(item.unitPrice);
+      const amount = Number(item.amount);
+      if (!item.description || qty <= 0 || unitPrice < 0 || amount < 0) {
+        return null;
+      }
+      return { ...item, qty, unitPrice, amount };
+    });
+
+    if (lineItems.some((item: any) => item === null)) {
+      return res.status(400).json({ error: 'Invoice contains invalid line items. Please verify each row.' });
+    }
+
+    const lineTotal = lineItems.reduce((sum: number, item: any) => sum + item.amount, 0);
+    const expectedGross = Number(data.grossAmount);
+    if (Math.abs(lineTotal - expectedGross) > 1) {
+      return res.status(400).json({ error: 'Gross amount must equal the sum of invoice line amounts' });
+    }
+
+    const invTotal = Number(data.totalAmountDue);
+    if (invTotal < 0) {
+      return res.status(400).json({ error: 'Total amount due must be greater than or equal to 0' });
+    }
+
+    // Check if supplier is Active
+    const supplier = await prisma.supplier.findUnique({ where: { id: po.supplierId } });
+    if (!supplier || supplier.status !== 'ACTIVE') {
+      return res.status(400).json({ error: 'Supplier is not Active. Cannot process invoice for inactive supplier.' });
+    }
     
     // 3-Way Match Logic
     let matchStatus = 'PENDING';

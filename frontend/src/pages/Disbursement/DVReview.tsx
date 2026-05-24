@@ -33,17 +33,34 @@ const DVReview = () => {
 
   const releasePayment = async () => {
     if (!voucher) return;
-    const payment = await modulesApi.createPayment({
-      voucherId: voucher.id,
-      paymentMode,
-      checkNo,
-      referenceNo,
-      recipientName: recipientName || voucher.payee,
-      modeOfReceipt: paymentMode,
-      acknowledgedReceipt,
-      releasedBy: user?.name
-    });
-    setSavedPayment(payment);
+    
+    // Validate document completeness
+    if (!docsComplete) {
+      alert('Documents are not complete. Please verify all required documents (PO, RR, Invoice, Approved Voucher) before proceeding.');
+      return;
+    }
+    
+    try {
+      const payment = await modulesApi.createPayment({
+        voucherId: voucher.id,
+        paymentMode,
+        checkNo,
+        referenceNo,
+        recipientName: recipientName || voucher.payee,
+        modeOfReceipt: paymentMode,
+        acknowledgedReceipt,
+        releasedBy: user?.name
+      });
+      setSavedPayment(payment);
+    } catch (error: any) {
+      // If payment fails, return to Accounting
+      if (error.response?.data?.error?.includes('Payment processing failed')) {
+        alert('Payment processing failed. Returning to Accounting Department for review.');
+        // In production, would navigate back to Accounting or show return screen
+      } else {
+        alert(error.response?.data?.error || 'Error releasing payment');
+      }
+    }
   };
 
   if (!voucher) return <div className="p-8 text-white">Loading...</div>;

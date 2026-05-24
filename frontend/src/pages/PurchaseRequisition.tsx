@@ -48,6 +48,46 @@ const PurchaseRequisition = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!department) {
+      alert('Please select a requesting department');
+      return;
+    }
+    if (!purpose) {
+      alert('Please enter the purpose of request');
+      return;
+    }
+    if (!dateNeeded) {
+      alert('Please enter the date needed');
+      return;
+    }
+    
+    // Validate items
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (!item.itemCode) {
+        alert(`Item ${i + 1}: Item code is required`);
+        return;
+      }
+      if (!item.description) {
+        alert(`Item ${i + 1}: Item description is required`);
+        return;
+      }
+      if (Number(item.quantity) <= 0) {
+        alert(`Item ${i + 1}: Quantity must be greater than 0`);
+        return;
+      }
+      if (Number(item.unitCost) <= 0) {
+        alert(`Item ${i + 1}: Unit cost must be greater than 0`);
+        return;
+      }
+    }
+
+    if (!window.confirm('Confirm submission? Yes / No')) {
+      return;
+    }
+    
     try {
       await procurementApi.createPR({
         requestedBy: 'Store Manager', // Hardcoded for demo until auth context is built
@@ -63,9 +103,22 @@ const PurchaseRequisition = () => {
       setPurpose('');
       setDateNeeded('');
       setItems([{ itemCode: '', description: '', quantity: 1, unit: 'pcs', unitCost: 0 }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to submit PR:', error);
-      alert('Error creating PR');
+      const errorMessage = error.response?.data?.error || 'Unable to create PR. Please complete all required fields and try again.';
+      alert(errorMessage);
+    }
+  };
+
+  const submitPR = async (id: string) => {
+    try {
+      await procurementApi.submitPR(id);
+      fetchPRs();
+      alert('Purchase requisition submitted for approval.');
+    } catch (error: any) {
+      console.error('Failed to submit PR:', error);
+      const errorMessage = error.response?.data?.error || 'Unable to submit PR for approval.';
+      alert(errorMessage);
     }
   };
 
@@ -217,6 +270,18 @@ const PurchaseRequisition = () => {
                       <td className="py-4 text-white/70">{formatDate(pr.datePrepared || pr.createdAt)}</td>
                       <td className="py-4">{pr.requestingDept}</td>
                       <td className="py-4">{formatMoney(pr.totalCost)}</td>
+                      <td className="py-4 text-right">
+                        {pr.status === 'DRAFT' ? (
+                          <button
+                            onClick={() => submitPR(pr.id)}
+                            className="text-sm text-green-400 hover:text-green-300 font-medium px-3 py-1 bg-green-500/10 rounded-lg"
+                          >
+                            Submit
+                          </button>
+                        ) : (
+                          <span className="px-3 py-1 rounded-lg bg-white/5 text-white/75 text-xs">{pr.status}</span>
+                        )}
+                      </td>
                       <td className="py-4"><StatusBadge status={pr.status} /></td>
                       <td className="py-4 text-right">
                         <button

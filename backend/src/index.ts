@@ -14,6 +14,7 @@ import inventoryRoutes from './routes/inventory';
 import apRoutes from './routes/ap';
 import vouchersRoutes from './routes/vouchers';
 import disbursementRoutes from './routes/disbursement';
+import auditRoutes from './routes/audit';
 import discrepancyRoutes from './routes/discrepancy';
 import devFixtureRoutes from './routes/devFixtures';
 
@@ -60,6 +61,7 @@ apiRouter.use('/ap', apRoutes);
 apiRouter.use('/vouchers', vouchersRoutes);
 apiRouter.use('/disbursement', disbursementRoutes);
 apiRouter.use('/discrepancies', discrepancyRoutes);
+apiRouter.use('/audit', auditRoutes);
 // apiRouter.use('/reports', reportRoutes);
 
 app.use('/api/v1', apiRouter);

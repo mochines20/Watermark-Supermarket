@@ -12,7 +12,8 @@ export interface AuthRequest extends Request {
 }
 
 export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (process.env.DEV_BYPASS === 'true') {
+  // DEV_BYPASS is only allowed in development environment with strict validation
+  if (process.env.NODE_ENV === 'development' && process.env.DEV_BYPASS === 'true') {
     const mockUser = {
       id: 'dev-admin-id',
       name: 'Dev Administrator',

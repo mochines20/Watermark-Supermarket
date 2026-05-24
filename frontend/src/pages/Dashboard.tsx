@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { GlassCard } from '../components/ui/GlassCard';
 import { procurementApi } from '../api/procurement';
 import { modulesApi } from '../api/modulesApi';
@@ -8,6 +9,7 @@ import { format } from 'date-fns';
 const peso = '\u20B1';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [metrics, setMetrics] = useState({
     pendingApprovals: 0,
@@ -23,10 +25,10 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [prs, pos, inventory, invoices, receivingDashboard] = await Promise.all([
+        const [prs, pos, alerts, invoices, receivingDashboard] = await Promise.all([
           procurementApi.getPRs(),
           procurementApi.getPOs(),
-          modulesApi.getInventory(),
+          modulesApi.getInventoryAlerts(),
           modulesApi.getInvoices(),
           modulesApi.getReceivingDashboard()
         ]);
@@ -39,8 +41,8 @@ const Dashboard = () => {
             acc[level] = (acc[level] || 0) + 1;
             return acc;
           }, {});
-        const openPOs = pos.filter((po: any) => po.status === 'OPEN').length;
-        const reorderAlerts = inventory.filter((item: any) => ['LOW_STOCK', 'CRITICAL'].includes(item.stockStatus)).length;
+        const openPOs = pos.filter((po: any) => ['OPEN', 'PARTIALLY_RECEIVED'].includes(po.status)).length;
+        const reorderAlerts = Array.isArray(alerts) ? alerts.length : 0;
         const pendingInvoices = invoices.filter((inv: any) => ['PENDING', 'OPEN', 'DRAFT'].includes(inv.status)).length;
 
         const outstandingPayables = invoices
@@ -73,6 +75,8 @@ const Dashboard = () => {
     };
 
     fetchDashboardData();
+    const refreshTimer = window.setInterval(fetchDashboardData, 30000);
+    return () => window.clearInterval(refreshTimer);
   }, []);
 
   return (
@@ -223,30 +227,46 @@ const Dashboard = () => {
         <GlassCard className="min-h-[400px] flex flex-col">
           <h3 className="text-lg font-bold text-white mb-4 display-font">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-4 flex-1">
-            <button className="flex flex-col items-center justify-center p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all group">
-              <div className="p-3 bg-[#4FD3EC]/10 text-[#4FD3EC] rounded-full mb-3 group-hover:scale-110 transition-transform">
-                <FileText size={24} />
-              </div>
-              <span className="text-sm font-medium text-white">Create PR</span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all group">
-              <div className="p-3 bg-[#82D1B1]/10 text-[#82D1B1] rounded-full mb-3 group-hover:scale-110 transition-transform">
-                <ShoppingCart size={24} />
-              </div>
-              <span className="text-sm font-medium text-white">Create PO</span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all group">
-              <div className="p-3 bg-yellow-500/10 text-yellow-500 rounded-full mb-3 group-hover:scale-110 transition-transform">
-                <AlertTriangle size={24} />
-              </div>
-              <span className="text-sm font-medium text-white">Log Issue</span>
-            </button>
-            <button className="flex flex-col items-center justify-center p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all group">
-              <div className="p-3 bg-purple-500/10 text-purple-400 rounded-full mb-3 group-hover:scale-110 transition-transform">
-                <CreditCard size={24} />
-              </div>
-              <span className="text-sm font-medium text-white">Pay Invoice</span>
-            </button>
+            <button
+            type="button"
+            onClick={() => navigate('/pr')}
+            className="flex flex-col items-center justify-center p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all group"
+          >
+            <div className="p-3 bg-[#4FD3EC]/10 text-[#4FD3EC] rounded-full mb-3 group-hover:scale-110 transition-transform">
+              <FileText size={24} />
+            </div>
+            <span className="text-sm font-medium text-white">Create PR</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/po')}
+            className="flex flex-col items-center justify-center p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all group"
+          >
+            <div className="p-3 bg-[#82D1B1]/10 text-[#82D1B1] rounded-full mb-3 group-hover:scale-110 transition-transform">
+              <ShoppingCart size={24} />
+            </div>
+            <span className="text-sm font-medium text-white">Create PO</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/receiving/discrepancies')}
+            className="flex flex-col items-center justify-center p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all group"
+          >
+            <div className="p-3 bg-yellow-500/10 text-yellow-500 rounded-full mb-3 group-hover:scale-110 transition-transform">
+              <AlertTriangle size={24} />
+            </div>
+            <span className="text-sm font-medium text-white">Log Issue</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/disbursement/payments')}
+            className="flex flex-col items-center justify-center p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all group"
+          >
+            <div className="p-3 bg-purple-500/10 text-purple-400 rounded-full mb-3 group-hover:scale-110 transition-transform">
+              <CreditCard size={24} />
+            </div>
+            <span className="text-sm font-medium text-white">Pay Invoice</span>
+          </button>
           </div>
         </GlassCard>
       </div>

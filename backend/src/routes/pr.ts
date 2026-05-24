@@ -8,13 +8,21 @@ import { auditUser, logAudit } from '../utils/audit';
 const router = express.Router();
 router.use(authenticateToken);
 
-// Helper to generate PR number
+// Helper to generate PR number with row-level locking
 const generatePRNumber = async () => {
   const year = new Date().getFullYear();
-  const counter = await prisma.counter.upsert({
-    where: { type: 'PR' },
-    update: { value: { increment: 1 } },
-    create: { type: 'PR', value: 1 }
+  const counter = await prisma.$transaction(async (tx) => {
+    const existing = await tx.counter.findUnique({ where: { type: 'PR' } });
+    if (existing) {
+      return await tx.counter.update({
+        where: { type: 'PR' },
+        data: { value: { increment: 1 } }
+      });
+    } else {
+      return await tx.counter.create({
+        data: { type: 'PR', value: 1 }
+      });
+    }
   });
   const sequence = String(counter.value).padStart(5, '0');
   return `PR-${year}-${sequence}`;
@@ -35,7 +43,30 @@ router.post('/', requireRole('REQUESTER', 'STORE_MANAGER', 'ADMIN'), async (req,
   try {
     const prNumber = await generatePRNumber();
     const data = req.body;
-    
+
+    const requiredFields = ['requestedBy', 'requestingDept', 'purposeOfRequest', 'dateNeeded', 'items'];
+    for (const field of requiredFields) {
+      if (data[field] === undefined || data[field] === null || (typeof data[field] === 'string' && data[field].trim() === '')) {
+        return res.status(400).json({ error: `Missing required field: ${field}` });
+      }
+    }
+
+    if (!Array.isArray(data.items) || data.items.length === 0) {
+      return res.status(400).json({ error: 'Purchase requisition must include at least one item' });
+    }
+
+    const invalidItem = data.items.find((item: any) => !item.itemCode || !item.description || Number(item.quantity) <= 0 || Number(item.unitCost) < 0);
+    if (invalidItem) {
+      return res.status(400).json({ error: 'Each requisition item must include item code, description, positive quantity, and non-negative cost' });
+    }
+
+    const dateNeeded = new Date(data.dateNeeded);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (Number.isNaN(dateNeeded.getTime()) || dateNeeded < today) {
+      return res.status(400).json({ error: 'Date needed must be today or in the future' });
+    }
+
     // Auto-calculate total cost
     const totalCost = data.items.reduce((sum: number, item: any) => sum + (Number(item.quantity) * Number(item.unitCost)), 0);
 
@@ -51,7 +82,7 @@ router.post('/', requireRole('REQUESTER', 'STORE_MANAGER', 'ADMIN'), async (req,
         purposeOfRequest: data.purposeOfRequest,
         address: data.address,
         contactNo: data.contactNo,
-        dateNeeded: new Date(data.dateNeeded),
+        dateNeeded: dateNeeded,
         suggestedSupplier: data.suggestedSupplier,
         vendorCode: data.vendorCode,
         totalCost,
@@ -83,9 +114,15 @@ router.post('/', requireRole('REQUESTER', 'STORE_MANAGER', 'ADMIN'), async (req,
     });
     
     res.json(pr);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating PR:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    if (error.code === 'P2002') {
+      return res.status(400).json({ error: 'Duplicate entry detected' });
+    }
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Required record not found' });
+    }
+    res.status(500).json({ error: 'Failed to create purchase requisition' });
   }
 });
 

@@ -102,6 +102,21 @@ const Suppliers = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate phone format (basic validation for Philippine phone numbers)
+    const phoneRegex = /^(\+63|0)?[9]\d{9}$/;
+    if (formData.contactDetails && !phoneRegex.test(formData.contactDetails.replace(/[\s-]/g, ''))) {
+      alert('Invalid contact format. Please enter a valid Philippine phone number (e.g., 09123456789 or +639123456789)');
+      return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      alert('Invalid email format. Please enter a valid email address.');
+      return;
+    }
+    
     try {
       await procurementApi.createSupplier(formData);
       setShowForm(false);

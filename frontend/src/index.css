@@ -366,6 +366,22 @@ h1, h2, h3, h4, h5, h6, .display-font {
   color: #1f4e79;
 }
 
+.wm-col-10 {
+  width: 10%;
+}
+
+.wm-col-15 {
+  width: 15%;
+}
+
+.wm-col-18 {
+  width: 18%;
+}
+
+.wm-col-50 {
+  width: 50%;
+}
+
 .wm-table td:last-child,
 .wm-table th:last-child {
   border-right: none;

@@ -33,7 +33,14 @@ router.get('/', async (req, res) => {
 router.post('/', requireRole('ACCOUNTING', 'AP_CLERK', 'ADMIN'), async (req, res) => {
   try {
     const data = req.body;
-    
+
+    if (!data.invoiceId) {
+      return res.status(400).json({ error: 'Invoice ID is required to generate a voucher' });
+    }
+    if (!data.amountWords || String(data.amountWords).trim() === '') {
+      return res.status(400).json({ error: 'Amount in words is required' });
+    }
+
     const invoice = await prisma.supplierInvoice.findUnique({ where: { id: data.invoiceId }, include: { supplier: true } });
     if (!invoice) return res.status(404).json({ error: 'Invoice not found' });
     if (invoice.threeWayStatus !== 'MATCHED') return res.status(400).json({ error: 'Invoice must be MATCHED to generate voucher' });

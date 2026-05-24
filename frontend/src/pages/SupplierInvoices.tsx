@@ -28,12 +28,50 @@ const SupplierInvoices = () => {
     grossAmount: 0,
     netAmount: 0,
     vatAmount: 0,
-    totalAmountDue: 0
+    totalAmountDue: 0,
+    amountWords: ''
   });
+
+  const [items, setItems] = useState<any[]>([
+    { description: '', qty: 1, unit: '', unitPrice: 0, amount: 0 }
+  ]);
+
+  const invoiceTotal = useMemo(() => {
+    const gross = items.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+    const net = Number(formData.netAmount || 0);
+    const vat = Number(formData.vatAmount || 0);
+    const total = net + vat;
+    return {
+      gross,
+      net,
+      vat,
+      total
+    };
+  }, [items, formData.vatAmount, formData.netAmount]);
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  const addInvoiceLine = () => {
+    setItems((prev) => [...prev, { description: '', qty: 1, unit: '', unitPrice: 0, amount: 0 }]);
+  };
+
+  const updateInvoiceLine = (index: number, field: string, value: any) => {
+    setItems((prev) => {
+      const updated = [...prev];
+      const line = { ...updated[index], [field]: value };
+      if (field === 'qty' || field === 'unitPrice') {
+        line.amount = Number(line.qty || 0) * Number(line.unitPrice || 0);
+      }
+      updated[index] = line;
+      return updated;
+    });
+  };
+
+  const removeInvoiceLine = (index: number) => {
+    setItems((prev) => prev.filter((_, idx) => idx !== index));
+  };
 
   const fetchData = async () => {
     try {
@@ -52,11 +90,65 @@ const SupplierInvoices = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.invoiceNo || !formData.poNumber || !formData.rrNumber || !formData.invoiceDate || !formData.dueDate) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    if (!Array.isArray(items) || items.length === 0) {
+      alert('Please add at least one invoice line item');
+      return;
+    }
+
+    const invalidLine = items.find((item) => !item.description || Number(item.qty) <= 0 || Number(item.unitPrice) < 0 || Number(item.amount) < 0);
+    if (invalidLine) {
+      alert('Each invoice line must include a description, positive quantity, and non-negative prices');
+      return;
+    }
+
+    if (new Date(formData.dueDate) <= new Date(formData.invoiceDate)) {
+      alert('Due date must be after invoice date');
+      return;
+    }
+
+    const gross = items.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+    if (Math.abs(gross - Number(formData.grossAmount || 0)) > 0.01) {
+      alert('Invoice gross amount must match the sum of line item amounts');
+      return;
+    }
+    const expectedTotal = Number(formData.netAmount || 0) + Number(formData.vatAmount || 0);
+    if (Math.abs(expectedTotal - Number(formData.totalAmountDue || 0)) > 0.01) {
+      alert('Total amount due must equal net amount plus VAT');
+      return;
+    }
+
+    if (Number(formData.totalAmountDue) <= 0) {
+      alert('Total amount due must be greater than 0');
+      return;
+    }
+
     try {
-      await modulesApi.createInvoice({
+      const result = await modulesApi.createInvoice({
         ...formData,
-        items: [] // Simplified for demo
+        items
       });
+      
+      // Check if 3-way match failed (EXCEPTION status)
+      if (result.threeWayStatus === 'EXCEPTION') {
+        const reason = prompt('3-Way Match Failed. Please enter reason for correction:');
+        if (reason) {
+          // Return for correction - could implement a separate API endpoint for this
+          alert(`Invoice marked for correction. Reason: ${reason}. Please return to Accounting Department.`);
+          setShowForm(false);
+          fetchData();
+          return;
+        } else {
+          alert('Correction cancelled. Invoice not saved.');
+          return;
+        }
+      }
+      
       setShowForm(false);
       fetchData();
     } catch (error: any) {
@@ -89,7 +181,14 @@ const SupplierInvoices = () => {
     }
   };
 
-  const formatMoney = (value: any) => `₱${Number(value || 0).toLocaleString()}`;
+  const formatMoney = (value: any) => `₱${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  const formatMatchStatus = (status: string) => {
+    if (status === 'MATCHED') return '3-Way Match Verified';
+    if (status === 'EXCEPTION') return '3-Way Match Exception';
+    if (status === 'PENDING') return '3-Way Match Pending';
+    return status.replace(/_/g, ' ');
+  };
 
   const openInvoices = invoices.filter(i => i.status !== 'PAID' && i.status !== 'CANCELLED');
   
@@ -143,7 +242,67 @@ const SupplierInvoices = () => {
               <GlassInput label="RR Number" name="rrNumber" value={formData.rrNumber} onChange={handleInputChange} required />
               <GlassInput label="Invoice Date" type="date" name="invoiceDate" value={formData.invoiceDate} onChange={handleInputChange} required />
               <GlassInput label="Due Date" type="date" name="dueDate" value={formData.dueDate} onChange={handleInputChange} required />
+              <GlassInput label="Gross Amount" type="number" name="grossAmount" value={formData.grossAmount} onChange={handleInputChange} required />
+              <GlassInput label="VAT Amount" type="number" name="vatAmount" value={formData.vatAmount} onChange={handleInputChange} required />
+              <GlassInput label="Net Amount" type="number" name="netAmount" value={formData.netAmount} onChange={handleInputChange} required />
               <GlassInput label="Total Amount Due" type="number" name="totalAmountDue" value={formData.totalAmountDue} onChange={handleInputChange} required />
+              <GlassInput label="Amount in Words" name="amountWords" value={formData.amountWords} onChange={handleInputChange} required />
+            </div>
+
+            <div className="mt-6">
+              <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+                <h3 className="text-lg text-white font-medium">Invoice Line Items</h3>
+                <button type="button" onClick={addInvoiceLine} className="text-sm text-watermark-blue-300 hover:text-white flex items-center gap-1">
+                  <Plus size={16} /> Add Line
+                </button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-white border-collapse">
+                  <thead>
+                    <tr className="border-b border-white/10 text-watermark-blue-200 text-sm">
+                      <th className="pb-3 font-medium">Description</th>
+                      <th className="pb-3 font-medium">Qty</th>
+                      <th className="pb-3 font-medium">Unit</th>
+                      <th className="pb-3 font-medium">Unit Price</th>
+                      <th className="pb-3 font-medium">Amount</th>
+                      <th className="pb-3 font-medium text-right">Remove</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {items.map((item, index) => (
+                      <tr key={index} className="hover:bg-white/5">
+                        <td className="py-3"><input value={item.description} onChange={(e) => updateInvoiceLine(index, 'description', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-white" placeholder="Item description" /></td>
+                        <td className="py-3"><input type="number" min={1} value={item.qty} onChange={(e) => updateInvoiceLine(index, 'qty', Number(e.target.value))} className="w-20 bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-white" /></td>
+                        <td className="py-3"><input value={item.unit} onChange={(e) => updateInvoiceLine(index, 'unit', e.target.value)} className="w-24 bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-white" placeholder="PCS" /></td>
+                        <td className="py-3"><input type="number" min={0} value={item.unitPrice} onChange={(e) => updateInvoiceLine(index, 'unitPrice', Number(e.target.value))} className="w-28 bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-white" /></td>
+                        <td className="py-3">₱{Number(item.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        <td className="py-3 text-right">
+                          <button type="button" onClick={() => removeInvoiceLine(index)} className="text-sm text-red-400 hover:text-red-300">Remove</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                <div className="p-4 bg-white/5 rounded-xl">
+                  <div className="text-watermark-blue-200 text-sm">Line Total</div>
+                  <div className="text-2xl text-white font-bold">₱{invoiceTotal.gross.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                </div>
+                <div className="p-4 bg-white/5 rounded-xl">
+                  <div className="text-watermark-blue-200 text-sm">VAT Amount</div>
+                  <div className="text-2xl text-white font-bold">₱{invoiceTotal.vat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                </div>
+                <div className="p-4 bg-white/5 rounded-xl">
+                  <div className="text-watermark-blue-200 text-sm">Net Amount</div>
+                  <div className="text-2xl text-white font-bold">₱{invoiceTotal.net.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                </div>
+                <div className="p-4 bg-white/5 rounded-xl">
+                  <div className="text-watermark-blue-200 text-sm">Total Due</div>
+                  <div className="text-2xl text-white font-bold">₱{invoiceTotal.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                </div>
+              </div>
             </div>
             <div className="flex justify-end pt-6 border-t border-white/10">
               <PrimaryButton type="submit">Submit & Match</PrimaryButton>
@@ -171,8 +330,8 @@ const SupplierInvoices = () => {
                     <td className="py-4 font-medium flex items-center gap-2"><Receipt size={16} className="text-pink-400" />{inv.invoiceNo}</td>
                     <td className="py-4">{inv.supplier?.name}</td>
                     <td className="py-4">{format(new Date(inv.dueDate), 'MMM dd, yyyy')}</td>
-                    <td className="py-4 font-bold">₱{Number(inv.totalAmountDue).toLocaleString()}</td>
-                    <td className="py-4"><StatusBadge status={inv.threeWayStatus} /></td>
+                    <td className="py-4 font-bold">{formatMoney(inv.totalAmountDue)}</td>
+                    <td className="py-4"><StatusBadge status={formatMatchStatus(inv.threeWayStatus)} /></td>
                     <td className="py-4"><StatusBadge status={inv.status} /></td>
                     <td className="py-4 text-right">
                       <button

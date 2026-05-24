@@ -47,6 +47,13 @@ const InventoryList = () => {
     return matchesQuery && matchesCategory && matchesStatus;
   });
 
+  // Low stock items for PO creation suggestion
+  const suggestPO = (item: InventoryItem) => {
+    // Navigate to PO creation with this item pre-filled
+    // This would typically open a modal or navigate to PO page
+    alert(`Suggested PO creation for: ${item.description}\nItem Code: ${item.itemCode}\nCurrent Stock: ${item.qtyOnHand}\nReorder Point: ${item.reorderPoint}\n\nIn production, this would open the PO creation form with this item pre-filled.`);
+  };
+
   const reset = () => {
     setQuery('');
     setCategory('');
@@ -69,11 +76,11 @@ const InventoryList = () => {
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50" />
             <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by item code or name" className="w-full bg-black/20 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-white" />
           </div>
-          <select value={category} onChange={(e) => setCategory(e.target.value)} className="bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-white">
+          <select aria-label="Filter by category" value={category} onChange={(e) => setCategory(e.target.value)} className="bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-white">
             <option value="" className="text-black">All Categories</option>
             {categories.map((value) => <option className="text-black" key={value} value={value}>{value}</option>)}
           </select>
-          <select value={status} onChange={(e) => setStatus(e.target.value)} className="bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-white">
+          <select aria-label="Filter by stock status" value={status} onChange={(e) => setStatus(e.target.value)} className="bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-white">
             <option value="" className="text-black">All Statuses</option>
             <option value="NORMAL" className="text-black">Normal</option>
             <option value="LOW_STOCK" className="text-black">Low Stock</option>
@@ -128,6 +135,11 @@ const InventoryList = () => {
                       <button onClick={() => setAdjusting(item)} className="px-3 py-1 rounded-lg bg-watermark-blue-500/20 text-white hover:bg-watermark-blue-500/30 text-sm">
                         Adjust Stock
                       </button>
+                      {(item.stockStatus === 'LOW_STOCK' || item.stockStatus === 'CRITICAL') && (
+                        <button onClick={() => suggestPO(item)} className="px-3 py-1 rounded-lg bg-amber-500/20 text-amber-200 hover:bg-amber-500/30 text-sm">
+                          Create PO
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

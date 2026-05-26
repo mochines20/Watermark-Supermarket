@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { PrimaryButton } from '../components/ui/PrimaryButton';
 import { GlassInput } from '../components/ui/GlassInput';
+import { StatusBadge } from '../components/ui/StatusBadge';
 import { Plus, X, AlertTriangle } from 'lucide-react';
 import { modulesApi } from '../api/modulesApi';
 import { format } from 'date-fns';
@@ -12,6 +13,7 @@ const DiscrepancyReports = () => {
   const [loading, setLoading] = useState(true);
   const [printOpen, setPrintOpen] = useState(false);
   const [printDr, setPrintDr] = useState<any | null>(null);
+  const [listViewOpen, setListViewOpen] = useState(false);
 
   // Form State
   const [rrId, setRrId] = useState('');
@@ -94,9 +96,14 @@ const DiscrepancyReports = () => {
           <p className="text-watermark-blue-200 mt-1">Log issues with delivered goods (damaged, missing, wrong items)</p>
         </div>
         {!showForm && (
-          <PrimaryButton onClick={() => setShowForm(true)} icon={<Plus size={18} />}>
-            Report Issue
-          </PrimaryButton>
+          <div className="flex gap-3">
+            <PrimaryButton onClick={() => setListViewOpen(true)} icon={<AlertTriangle size={18} />}>
+              View Discrepancy List
+            </PrimaryButton>
+            <PrimaryButton onClick={() => setShowForm(true)} icon={<Plus size={18} />}>
+              Report Issue
+            </PrimaryButton>
+          </div>
         )}
       </div>
 
@@ -168,6 +175,48 @@ const DiscrepancyReports = () => {
             </table>
           </div>
         </GlassCard>
+      )}
+
+      {listViewOpen && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-slate-800 rounded-xl p-6 w-full max-w-4xl max-h-[80vh] overflow-auto border border-white/10">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-white">Discrepancy List View</h2>
+              <button onClick={() => setListViewOpen(false)} className="text-white/50 hover:text-white">
+                <X size={24} />
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-white border-collapse">
+                <thead>
+                  <tr className="border-b border-white/10 text-watermark-blue-200 text-sm">
+                    <th className="pb-3 font-medium">DR Number</th>
+                    <th className="pb-3 font-medium">RR Ref</th>
+                    <th className="pb-3 font-medium">Date Reported</th>
+                    <th className="pb-3 font-medium">Issue</th>
+                    <th className="pb-3 font-medium">Action</th>
+                    <th className="pb-3 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {reports.map((dr) => (
+                    <tr key={dr.id} className="hover:bg-white/5">
+                      <td className="py-4 font-medium flex items-center gap-2"><AlertTriangle size={16} className="text-yellow-400" />{dr.reportNo}</td>
+                      <td className="py-4">{dr.rr?.rrNumber}</td>
+                      <td className="py-4">{format(new Date(dr.createdAt), 'MMM dd, yyyy')}</td>
+                      <td className="py-4 text-white/80">{dr.descriptionOfIssue}</td>
+                      <td className="py-4 text-white/80">{dr.recommendedAction}</td>
+                      <td className="py-4"><StatusBadge status={dr.rr?.status || 'OPEN'} /></td>
+                    </tr>
+                  ))}
+                  {reports.length === 0 && (
+                    <tr><td colSpan={6} className="py-8 text-center text-white/50">No discrepancy reports found.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       )}
 
       {printOpen && printDr && (

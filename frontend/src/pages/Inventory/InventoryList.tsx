@@ -27,7 +27,11 @@ const InventoryList = () => {
   const load = async () => {
     setLoading(true);
     try {
-      setItems(await modulesApi.getInventory());
+      const data = await modulesApi.getInventory();
+      setItems(data || []);
+    } catch (error) {
+      console.error('Failed to load inventory:', error);
+      setItems([]);
     } finally {
       setLoading(false);
     }

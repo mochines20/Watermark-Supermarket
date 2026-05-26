@@ -8,22 +8,21 @@ import { auditUser, logAudit } from '../utils/audit';
 const router = express.Router();
 router.use(authenticateToken);
 
-// Helper to generate PR number with row-level locking
+// Helper to generate PR number
 const generatePRNumber = async () => {
   const year = new Date().getFullYear();
-  const counter = await prisma.$transaction(async (tx) => {
-    const existing = await tx.counter.findUnique({ where: { type: 'PR' } });
-    if (existing) {
-      return await tx.counter.update({
-        where: { type: 'PR' },
-        data: { value: { increment: 1 } }
-      });
-    } else {
-      return await tx.counter.create({
-        data: { type: 'PR', value: 1 }
-      });
-    }
-  });
+  const existing = await prisma.counter.findUnique({ where: { type: 'PR' } });
+  let counter;
+  if (existing) {
+    counter = await prisma.counter.update({
+      where: { type: 'PR' },
+      data: { value: { increment: 1 } }
+    });
+  } else {
+    counter = await prisma.counter.create({
+      data: { type: 'PR', value: 1 }
+    });
+  }
   const sequence = String(counter.value).padStart(5, '0');
   return `PR-${year}-${sequence}`;
 };

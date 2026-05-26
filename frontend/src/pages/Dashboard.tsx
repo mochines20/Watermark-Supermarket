@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlassCard } from '../components/ui/GlassCard';
 import { procurementApi } from '../api/procurement';
@@ -22,62 +22,62 @@ const Dashboard = () => {
   });
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
 
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      const [prs, pos, alerts, invoices, receivingDashboard] = await Promise.all([
+        procurementApi.getPRs(),
+        procurementApi.getPOs(),
+        modulesApi.getInventoryAlerts(),
+        modulesApi.getInvoices(),
+        modulesApi.getReceivingDashboard()
+      ]);
+
+      const pendingPRs = prs.filter((pr: any) => pr.status === 'PENDING_APPROVAL').length;
+      const approvalBreakdown = prs
+        .filter((pr: any) => pr.status === 'PENDING_APPROVAL')
+        .reduce((acc: Record<string, number>, pr: any) => {
+          const level = pr.approvalLevel || 'UNASSIGNED';
+          acc[level] = (acc[level] || 0) + 1;
+          return acc;
+        }, {});
+      const openPOs = pos.filter((po: any) => ['OPEN', 'PARTIALLY_RECEIVED'].includes(po.status)).length;
+      const reorderAlerts = Array.isArray(alerts) ? alerts.length : 0;
+      const pendingInvoices = invoices.filter((inv: any) => ['PENDING', 'OPEN', 'DRAFT'].includes(inv.status)).length;
+
+      const outstandingPayables = invoices
+        .filter((inv: any) => inv.status !== 'PAID' && inv.status !== 'CANCELLED')
+        .reduce((sum: number, inv: any) => sum + Number(inv.totalAmountDue || 0), 0);
+
+      setMetrics({
+        pendingApprovals: pendingPRs,
+        openPOs,
+        pendingDeliveries: receivingDashboard?.pendingDeliveries || 0,
+        pendingInvoices,
+        reorderAlerts,
+        outstandingPayables,
+        approvalBreakdown
+      });
+
+      // Combine PRs and POs for recent activity
+      const combined = [
+        ...prs.map((pr: any) => ({ ...pr, type: 'PR', displayId: pr.prNumber })),
+        ...pos.map((po: any) => ({ ...po, type: 'PO', displayId: po.poNumber }))
+      ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+       .slice(0, 5);
+
+      setRecentActivity(combined);
+    } catch (error) {
+      console.error('Failed to fetch dashboard data', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const [prs, pos, alerts, invoices, receivingDashboard] = await Promise.all([
-          procurementApi.getPRs(),
-          procurementApi.getPOs(),
-          modulesApi.getInventoryAlerts(),
-          modulesApi.getInvoices(),
-          modulesApi.getReceivingDashboard()
-        ]);
-
-        const pendingPRs = prs.filter((pr: any) => pr.status === 'PENDING_APPROVAL').length;
-        const approvalBreakdown = prs
-          .filter((pr: any) => pr.status === 'PENDING_APPROVAL')
-          .reduce((acc: Record<string, number>, pr: any) => {
-            const level = pr.approvalLevel || 'UNASSIGNED';
-            acc[level] = (acc[level] || 0) + 1;
-            return acc;
-          }, {});
-        const openPOs = pos.filter((po: any) => ['OPEN', 'PARTIALLY_RECEIVED'].includes(po.status)).length;
-        const reorderAlerts = Array.isArray(alerts) ? alerts.length : 0;
-        const pendingInvoices = invoices.filter((inv: any) => ['PENDING', 'OPEN', 'DRAFT'].includes(inv.status)).length;
-
-        const outstandingPayables = invoices
-          .filter((inv: any) => inv.status !== 'PAID' && inv.status !== 'CANCELLED')
-          .reduce((sum: number, inv: any) => sum + Number(inv.totalAmountDue || 0), 0);
-
-        setMetrics({
-          pendingApprovals: pendingPRs,
-          openPOs,
-          pendingDeliveries: receivingDashboard.pendingDeliveries || 0,
-          pendingInvoices,
-          reorderAlerts,
-          outstandingPayables,
-          approvalBreakdown
-        });
-
-        // Combine PRs and POs for recent activity
-        const combined = [
-          ...prs.map((pr: any) => ({ ...pr, type: 'PR', displayId: pr.prNumber })),
-          ...pos.map((po: any) => ({ ...po, type: 'PO', displayId: po.poNumber }))
-        ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-         .slice(0, 5);
-
-        setRecentActivity(combined);
-      } catch (error) {
-        console.error('Failed to fetch dashboard data', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDashboardData();
     const refreshTimer = window.setInterval(fetchDashboardData, 30000);
     return () => window.clearInterval(refreshTimer);
-  }, []);
+  }, [fetchDashboardData]);
 
   return (
     <div className="space-y-8 animate-slide-up">

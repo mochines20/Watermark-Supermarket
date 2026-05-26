@@ -39,7 +39,7 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as any;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "super-secret-key-change-me-in-production") as any;
     req.user = {
       id: decoded.id,
       name: decoded.name,

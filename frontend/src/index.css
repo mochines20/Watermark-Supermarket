@@ -318,6 +318,7 @@ h1, h2, h3, h4, h5, h6, .display-font {
   display: grid;
   grid-template-columns: 140px 1fr;
   border-bottom: 1px solid #1f4e79;
+  min-height: 28px;
 }
 
 .wm-field:nth-child(odd) {

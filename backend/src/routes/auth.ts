@@ -1,6 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import 'dotenv/config';
 import prisma from '../utils/prisma';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { requireRole } from '../middleware/role';
@@ -46,13 +47,13 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign(
       { id: user.id, role: user.role, department: user.department, name: user.name, email: user.email },
-      process.env.JWT_SECRET as string,
+      process.env.JWT_SECRET || "super-secret-key-change-me-in-production",
       { expiresIn: '15m' }
     );
     
     const refreshToken = jwt.sign(
       { id: user.id },
-      process.env.JWT_REFRESH_SECRET as string,
+      process.env.JWT_REFRESH_SECRET || "super-refresh-secret-change-me",
       { expiresIn: '7d' }
     );
 

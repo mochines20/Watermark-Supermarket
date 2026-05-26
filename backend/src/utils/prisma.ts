@@ -1,72 +1,10 @@
-import * as dns from 'dns';
-dns.setDefaultResultOrder('ipv4first');
+// Always use the in-memory mock seeded DB for the system.
+// This file replaces Prisma with a simple mock backed by `backend/dev-data.json`.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import mockPrisma from './mockPrisma';
 
-// Allow an in-memory fake DB for end-to-end dev flows using backend/dev-data.json
-if (process.env.USE_FAKE_DB === 'true' || process.env.USE_FAKE_DB === '1') {
-  // When using fake DB, load the lightweight mock implementation
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const mock = require('./mockPrisma').default;
-
-  // Wrap mock to inject audit log entries on mutating operations
-  const mutating = new Set(['create', 'update', 'delete', 'upsert']);
-
-  const handler: any = {
-    get(target: any, prop: string) {
-      if (prop === '$transaction') return async (cb: any) => cb(prisma);
-      if (prop === '$disconnect') return async () => {};
-      if (prop === '$connect') return async () => {};
-      // model access
-      const modelProxy = new Proxy({}, {
-        get(_, method: string) {
-          return async (args: any) => {
-            const impl = (target as any)[prop];
-            if (!impl || typeof impl[method] !== 'function') throw new Error(`Method ${String(method)} not implemented on mock model ${prop}`);
-            const result = await impl[method](args);
-            try {
-              if (method && mutating.has(method) && prop !== 'auditLog') {
-                // Best-effort audit log entry
-                await target.auditLog.create({ data: {
-                  userId: args?.__auditContext?.userId || 'SYSTEM',
-                  userName: args?.__auditContext?.userName || 'SYSTEM ACTION',
-                  action: method.toUpperCase(),
-                  module: prop.toUpperCase(),
-                  recordId: (result as any)?.id || 'UNKNOWN',
-                  recordNo: (result as any)?.prNumber || (result as any)?.poNumber || (result as any)?.rrNumber || (result as any)?.invoiceNo || (result as any)?.voucherNo || null,
-                  description: `${method.toUpperCase()} on ${prop}`,
-                  newData: result ? JSON.parse(JSON.stringify(result)) : null,
-                  timestamp: new Date()
-                }});
-              }
-            } catch (err) {
-              // don't let audit failures block main flow
-              // eslint-disable-next-line no-console
-              console.error('Mock audit write failed', err);
-            }
-            return result;
-          };
-        }
-      });
-      return modelProxy;
-    }
-  };
-
-  const prisma: any = new Proxy(mock, handler);
-
-  export default prisma;
-}
-
-// @ts-ignore - Supressing VS Code phantom cache error for PrismaClient
-import { PrismaClient } from '@prisma/client';
-import { Pool } from 'pg';
-import { PrismaPg } from '@prisma/adapter-pg';
-
-const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
-const adapter = new PrismaPg(pool);
-const basePrisma = new PrismaClient({ adapter });
+export default mockPrisma;
 
 // Map Prisma actions to descriptive names for Audit Log
 const mapAction = (action: string) => {
